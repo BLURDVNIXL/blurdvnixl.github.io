@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Réalisations Vidéo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- ANIMATIONS DE FOND --- */
+        @keyframes gradientAnimation {
+            0%   { background-position: 0%   50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0%   50%; }
+        }
+
+        /* --- POLICES --- */
+        @font-face {
+            font-family: 'Categories-elegant';
+            src: url('categories-elegant.ttf') format('truetype');
+            font-weight: normal;
+        }
+        @font-face {
+            font-family: 'Kingred';
+            src: url('kingred.otf') format('opentype');
+            font-weight: normal;
+        }
+
+        /* --- STYLES GÉNÉRAUX --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #240b14, #292929, #000000);
+            background-size: 2000% 2000%;
+            animation: gradientAnimation 15s ease infinite;
+            padding-bottom: 8rem;
+            color: #f8fafc;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 4rem auto;
+            padding: 0 5%;
+        }
+
+        h1 {
+            font-size: clamp(50px, 10vw, 100px);
+            font-family: 'Categories-elegant', serif;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: clamp(25px, 5vw, 45px);
+            font-family: 'Categories-elegant', serif;
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 4rem;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            padding: 0.8rem 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 70px;
+            position: fixed;
+            bottom: 2rem;       
+            left: 50%;            
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 350px;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: 0.3s;
+            opacity: 0.7;
+        }
+
+        .nav-link:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+
+        .menu-icon {
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 40%;
+            display: flex;
+        }
+
+        /* --- GRILLE VIDÉO EN ZIG-ZAG --- */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            gap: 120px;
+            padding: 50px 0;
+        }
+
+        .video-card {
+            width: 85%;
+            max-width: 650px;
+            border-radius: 35px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Ajustement pour les vidéos verticales */
+        .video-card.vertical {
+            max-width: 320px; /* Plus étroit pour le format vertical */
+        }
+
+        .card-left { align-self: flex-start; }
+        .card-right { align-self: flex-end; }
+
+        .video-wrapper {
+            width: 100%;
+            border-radius: 25px;
+            overflow: hidden;
+            aspect-ratio: 16 / 9; /* Format Paysage par défaut */
+            background: #000;
+        }
+
+        /* Format Portrait */
+        .vertical .video-wrapper {
+            aspect-ratio: 9 / 16;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .video-card:hover {
+            transform: scale(1.03);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- ANIMATIONS REVEAL --- */
+        .reveal {
+            opacity: 0;
+            transition: all 1s cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        .card-left.reveal { transform: translateX(-80px); }
+        .card-right.reveal { transform: translateX(80px); }
+
+        .reveal-visible {
+            opacity: 1 !important;
+            transform: translateX(0) !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-links">
+            <a href="dessins.html" class="nav-link">Dessins</a>
+            <a href="x.html" class="nav-link menu-icon" id="dynamicMenu">☰</a>
+            <a href="videos.html" class="nav-link">Vidéos</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1 class="reveal">What's Up?</h1>
+                <h3 class="reveal" style="transition-delay: 0.1s;">THIS IS MY MINI PORTFOLIO</h3>
+        <h3 class="reveal" style="transition-delay: 0.1s;">RÉALISATIONS VIDÉO</h3>
+        
+        <div class="video-container">
+            
+            <!-- Vidéo 1 (Horizontale) -->
+            <div class="video-card card-left reveal">
+                <div class="video-wrapper">
+                    <video src="HIDAN EDIT [E28B79D].mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+
+            <!-- Vidéo 2 (Verticale) -->
+            <div class="video-card card-right vertical reveal">
+                <div class="video-wrapper">
+                    <video src="ciedit [F51BBA3].mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+
+            <!-- Vidéo 3 (Verticale) -->
+            <div class="video-card card-left vertical reveal">
+                <div class="video-wrapper">
+                    <video src="Evenement de noel caiman 25 inp recap.mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+
+            <!-- Vidéo 4 (Horizontale) -->
+            <div class="video-card card-right reveal">
+                <div class="video-wrapper">
+                    <video src="Nouveau projet 81 Copy [138B7ED].mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const menuBtn = document.getElementById('dynamicMenu');
+            if (menuBtn && window.location.pathname.endsWith('x.html')) {
+                menuBtn.href = 'inscription.html';
+            }
+
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-visible');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        });
+    </script>
+
+</body>
+</html>

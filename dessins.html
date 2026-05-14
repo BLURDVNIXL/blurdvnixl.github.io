@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Accueil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- ANIMATIONS DE FOND --- */
+        @keyframes gradientAnimation {
+            0%   { background-position: 0%   50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0%   50%; }
+        }
+
+        @keyframes moveShine {
+            0%   { left: -150%; }
+            25%  { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        /* --- POLICES --- */
+        @font-face {
+            font-family: 'Categories-elegant';
+            src: url('categories-elegant.ttf') format('truetype');
+            font-weight: normal;
+        }
+        @font-face {
+            font-family: 'Kingred';
+            src: url('kingred.otf') format('opentype');
+            font-weight: normal;
+        }
+
+        /* --- STYLES GÉNÉRAUX --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #240b14, #292929, #000000);
+            background-size: 2000% 2000%;
+            animation: gradientAnimation 15s ease infinite;
+            padding-bottom: 8rem; /* Espace pour la nav fixe */
+            color: #f8fafc;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 5%;
+        }
+
+        h1 {
+            font-size: clamp(50px, 10vw, 100px);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-family: 'Categories-elegant', serif;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: clamp(30px, 6vw, 65px);
+            font-weight: 600;
+            margin-bottom: 2rem;
+            font-family: 'Categories-elegant', serif;
+            text-align: center;
+        }
+
+        h4 {
+            font-size: 30px;
+            font-family: 'Categories-elegant', serif;
+            text-align: center;
+            color: #cbd5e1;
+            margin-top: 3rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-family: 'Kingred', serif;
+            color: #cbd5e1;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        /* --- NAVIGATION (GLASSMORPHISM) --- */
+        nav {
+            padding: 0.8rem 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 70px;
+            position: fixed;
+            bottom: 2rem;       
+            left: 50%;            
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 350px;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .nav-link:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+        }
+
+        .menu-icon {
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 40%; /* Forme intermédiaire définie plus tôt */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- ANIMATIONS AU SCROLL --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.9s cubic-bezier(0.17, 0.55, 0.55, 1);
+        }
+
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        /* --- CONTENEUR GLOBAL --- */
+.drawing-container {
+    display: flex;
+    flex-direction: column;
+    gap: 100px; /* Espace important entre les cadres */
+    padding: 50px 0;
+}
+
+/* --- STYLE DES CADRES (PLUS GROS) --- */
+.drawing-card {
+    width: 80%; /* Cadre imposant */
+    max-width: 600px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px; /* Effet de bordure épaisse style "cadre photo" */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transition: transform 0.5s ease;
+}
+
+/* --- POSITIONNEMENT EN ZIG-ZAG --- */
+.card-left {
+    align-self: flex-start;
+    transform: rotate(-2deg); /* Légère rotation pour le style */
+}
+
+.card-right {
+    align-self: flex-end;
+    transform: rotate(2deg);
+}
+
+/* --- CONTENEUR IMAGE --- */
+.image-wrapper {
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9; /* Format plus large et cinématographique */
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(20%); /* Effet artistique */
+    transition: all 0.5s ease;
+}
+
+/* --- INTERACTIONS --- */
+.drawing-card:hover {
+    transform: rotate(0deg) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.drawing-card:hover img {
+    filter: grayscale(0%);
+}
+
+/* --- AJUSTEMENT DE L'ANIMATION REVEAL --- */
+.card-left.reveal {
+    opacity: 0;
+    transform: translateX(-100px) rotate(-5deg);
+}
+
+.card-right.reveal {
+    opacity: 0;
+    transform: translateX(100px) rotate(5deg);
+}
+
+.reveal-visible {
+    opacity: 1 !important;
+    transform: translateX(0) rotate(0deg) !important;
+}
+
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-links">
+            <a href="dessins.html" class="nav-link">Dessins</a>
+            <a href="x.html" class="nav-link menu-icon" id="dynamicMenu">☰</a>
+            <a href="videos.html" class="nav-link">Vidéos</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1 class="reveal">What's Up?</h1>
+        <h3 class="reveal" style="transition-delay: 0.1s;">THIS IS MY MINI PORTFOLIO</h3>
+        
+        <section class="gallery-section">
+    <h4 class="reveal">Mes Créations</h4>
+    
+    <div class="drawing-container">
+        
+        <div class="drawing-card card-left reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0012.jpg">
+            </div>
+        </div>
+
+        
+        <div class="drawing-card card-right reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0016.jpg">
+            </div>
+        </div>
+
+        
+        <div class="drawing-card card-left reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0009.jpg">
+            </div>
+        </div>
+
+        
+        <div class="drawing-card card-right reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0024.jpg">
+            </div>
+        </div>
+
+        
+        <div class="drawing-card card-left reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0011.jpg">
+            </div>
+        </div>
+
+        <div class="drawing-card card-right reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0025.jpg">
+            </div>
+        </div>
+
+        
+        <div class="drawing-card card-left reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0029.jpg">
+            </div>
+        </div>
+
+        
+        <div class="drawing-card card-right reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0028.jpg">
+            </div>
+        </div>
+
+        <div class="drawing-card card-left reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0013.jpg">
+            </div>
+        </div>
+
+        
+        <div class="drawing-card card-right reveal">
+            <div class="image-wrapper">
+                <img src="IMG-20251027-WA0017.jpg">
+            </div>
+        </div>
+
+    </div>
+</section>
+</section>
+
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // 1. Redirection intelligente du bouton menu
+            const menuBtn = document.getElementById('dynamicMenu');
+            if (menuBtn && window.location.pathname.endsWith('x.html')) {
+                menuBtn.href = 'inscription.html';
+            }
+
+            // 2. Animation d'apparition au scroll (Intersection Observer)
+            const observerOptions = {
+                threshold: 0.12, // Déclenche quand 12% de l'élément est visible
+                rootMargin: "0px 0px -50px 0px" // Petit décalage pour l'esthétique
+            };
+
+            const revealObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-visible');
+                        // On arrête d'observer une fois l'animation jouée
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // On applique l'observateur à tous les éléments "reveal"
+            document.querySelectorAll('.reveal').forEach(el => {
+                revealObserver.observe(el);
+            });
+        });
+    </script>
+
+</body>
+</html>
