@@ -1,517 +1,875 @@
-<!DOCTYPE html>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap');
+/* Importation des polices d'écriture depuis Google Fonts : 
+   - Bebas Neue : pour les titres percutants (style compact et majuscule)
+   - Outfit : pour les textes de contenu, les sous-titres et les badges (poids 300 à 700) */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Réinitialisation universelle : supprime les marges/paddings par défaut 
+   et force le modèle 'box-sizing: border-box' pour que les bordures et paddings 
+   soient inclus dans le calcul de la largeur/hauteur des éléments. */
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  :root {
-    --dc-purple: #6C3FC5;
-    --dc-violet: #9B59F5;
-    --dc-dark: #0A0A1A;
-    --dc-light: #F0EEFF;
-    --dc-accent: #C8A7FF;
-  }
+/* Style appliqué à la page entière (viewport) :
+   - background : Fond noir absolu.
+   - overflow: hidden : Empêche l'apparition des barres de défilement de la page.
+   - width/height : Force le body à occuper exactement 100% de la largeur et de la hauteur de la fenêtre. */
+body{
+  background: #000;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+  width: 100vw;
+  height: 100vh;
+}
 
-  body { background: transparent; font-family: 'Rajdhani', sans-serif; overflow: hidden; }
+/* Conteneur principal de la présentation (Le "Théâtre") :
+   - width/height : S'étend sur l'intégralité de l'écran (100vw / 100vh).
+   - position: relative : Sert de point de référence pour le positionnement absolu des éléments enfants (canvas, slides, contrôles). */
+#stage{
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
 
-  .presentation {
-    width: 680px;
-    height: 382px;
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    background: var(--dc-dark);
-  }
+/* Canvas d'arrière-plan destiné au rendu des particules et des nébuleuses :
+   - position: absolute / inset: 0 : Couvre toute la surface du conteneur parent.
+   - z-index: 0 : Placé tout au fond, derrière le texte et les éléments interactifs. */
+canvas#bg{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
 
-  .slide {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(60px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
+/* Structure de base pour chaque diapositive (Slide) :
+   - position: absolute / inset: 0 : Superposées les unes sur les autres au centre du stage.
+   - z-index: 2 : Placées au-dessus de l'arrière-plan animé.
+   - display: flex / flex-direction: column : Aligne le contenu verticalement et le centre horizontalement/verticalement.
+   - opacity: 0 / pointer-events: none : Par défaut, la slide est invisible et ignorable par la souris.
+   - transition : Effet de fondu enchaîné fluide de 0.8 seconde utilisant une courbe de Bézier personnalisée. */
+.slide{
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .8s cubic-bezier(.4,0,.2,1);
+}
 
-  .slide.active {
-    opacity: 1;
-    pointer-events: all;
-    transform: translateX(0);
-  }
+/* Classe CSS activée dynamiquement par JavaScript pour la slide en cours d'affichage :
+   - opacity: 1 : Rend la slide visible.
+   - pointer-events: all : Permet à l'utilisateur d'interagir avec les éléments internes (liens, boutons). */
+.slide.active{
+  opacity: 1;
+  pointer-events: all;
+}
 
-  .slide.exit {
-    opacity: 0;
-    transform: translateX(-60px);
-  }
+/* Calque de superposition à effet "Lignes de balayage cratère (Scanlines CRT)" :
+   - Utilise un dégradé linéaire répétitif pour simuler l'aspect d'un moniteur rétro/futuriste.
+   - pointer-events: none : Le calque est purement visuel et transparent aux clics.
+   - z-index: 3 : Positionné au-dessus du contenu pour appliquer l'effet globalement. */
+#scan{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+  pointer-events: none;
+}
 
-  /* ——— SLIDE 1 : HERO ——— */
-  .slide-hero {
-    background: linear-gradient(135deg, #0A0A1A 0%, #1a0a3a 50%, #0A0A1A 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-  }
+/* Calque d'effet Vignettage :
+   - Applique un dégradé radial (sombre sur les bords, transparent au centre) pour focaliser l'attention au milieu de l'écran. */
+#vig{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.8) 100%);
+  pointer-events: none;
+}
 
-  .hero-bg-circle {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-  }
+/* Canvas secondaire générant un effet de grain/bruit analogique subtil :
+   - opacity: .04 : Très transparent pour ne pas saturer l'affichage.
+   - z-index: 1 : Placé juste au-dessus du background pour texturer l'espace sombre. */
+#grain{
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: .04;
+  pointer-events: none;
+}
 
-  .c1 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(108,63,197,0.3) 0%, transparent 70%); top: -80px; right: -60px; }
-  .c2 { width: 200px; height: 200px; background: radial-gradient(circle, rgba(155,89,245,0.2) 0%, transparent 70%); bottom: -60px; left: 40px; }
+/* ── BARRE SUPÉRIEURE (TOP BAR) ──
+   Contient le logo, le nom de la marque et le compteur de slides.
+   - padding : Utilise clamp() pour s'adapter. Minimum 16px, idéal 2% de la largeur de l'écran, maximum 40px. */
+#topbar{
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(16px, 2vw, 40px) clamp(24px, 3vw, 60px);
+}
 
-  .hero-tag {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 4px;
-    color: var(--dc-accent);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    opacity: 0;
-    animation: fadeUp 0.6s ease 0.2s forwards;
-  }
+/* Alignement horizontal du logo et de son texte d'accompagnement */
+#logobadge{
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 0.8vw, 16px);
+}
 
-  .hero-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 88px;
-    line-height: 0.9;
-    letter-spacing: 4px;
-    color: white;
-    text-align: center;
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.4s forwards;
-  }
+/* Conteneur de l'image du logo :
+   - width/height : Évolue dynamiquement entre 32px et 64px selon la taille de l'écran.
+   - border-radius/border : Coins arrondis et fine bordure violette translucide. */
+#logoimg{
+  width: clamp(32px, 3.5vw, 64px);
+  height: clamp(32px, 3.5vw, 64px);
+  border-radius: clamp(4px, 0.5vw, 10px);
+  background: rgba(155,89,245,.18);
+  border: 1px solid rgba(155,89,245,.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  overflow: hidden;
+}
 
-  .hero-title span {
-    background: linear-gradient(90deg, #9B59F5, #C8A7FF);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+/* Image interne du logo :
+   - object-fit: contain : Empêche la distorsion de l'image.
+   - filter : Série de filtres graphiques inversant les couleurs et appliquant une teinte violette lumineuse (Cyberpunk). */
+#logoimg img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: invert(1) sepia(1) saturate(3) hue-rotate(220deg) brightness(1.3);
+}
 
-  .hero-sub {
-    font-size: 15px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 2px;
-    margin-top: 10px;
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.6s forwards;
-  }
+/* Texte de la marque (DATA CORP.) juxtaposé au logo. Taille fluide via clamp(). */
+#logotxt{
+  font-size: clamp(12px, 1.2vw, 22px);
+  font-weight: 700;
+  color: rgba(255,255,255,.6);
+  letter-spacing: 2px;
+}
 
-  .hero-contact {
-    margin-top: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--dc-accent);
-    letter-spacing: 1px;
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.8s forwards;
-  }
 
-  /* ——— SLIDE 2 : SERVICES ——— */
-  .slide-services {
-    background: #0D0D20;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
+/* ── DIAPOSITIVE 1 : ACCUEIL HERO (SLIDE 1) ── */
+#s0 { gap: 0; }
 
-  .services-left {
-    padding: 32px 28px;
-    border-right: 1px solid rgba(155,89,245,0.2);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
+/* Surtitre d'introduction (ex: "Service Professionnel") :
+   - letter-spacing : Espacement des lettres proportionnel à la largeur de l'écran (vw).
+   - opacity / transform : Préparation pour l'animation d'entrée en balayage vertical. */
+.hero-eyebrow{
+  font-size: clamp(10px, 1.1vw, 18px);
+  font-weight: 600;
+  letter-spacing: 0.5vw;
+  color: #8866EE;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .6s ease .1s, transform .6s ease .1s;
+}
 
-  .services-right {
-    padding: 32px 28px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 16px;
-  }
+/* Déclenchement de l'animation d'apparition du surtitre dès que la slide devient active */
+.active .hero-eyebrow{
+  opacity: 1;
+  transform: translateY(0);
+}
 
-  .section-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    color: var(--dc-violet);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
+/* Titre majeur (DATA CORPORATION) :
+   - font-size : Taille de police hautement dynamique (de 54px à 160px selon l'écran).
+   - line-height : Interligne resserré pour un aspect massif et moderne. */
+.hero-name{
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(54px, 10vw, 160px);
+  line-height: .85;
+  letter-spacing: 0.4vw;
+  color: #fff;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px) scale(.97);
+  transition: opacity .7s ease .25s, transform .7s ease .25s;
+}
 
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 42px;
-    color: white;
-    line-height: 1;
-    margin-bottom: 20px;
-  }
+/* Animation d'entrée du titre principal : retour à l'échelle 1 et position d'origine */
+.active .hero-name{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 
-  .service-card {
-    background: rgba(108,63,197,0.12);
-    border: 1px solid rgba(108,63,197,0.3);
-    border-radius: 8px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    opacity: 0;
-    transform: translateX(20px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-  }
+/* Style spécifique pour le mot en italique em (CORPORATION) :
+   - color: transparent : Supprime le fond du texte.
+   - -webkit-text-stroke : Crée un effet de texte détouré (contours violets néon). */
+.hero-name em{
+  font-style: normal;
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.15vw, 3px) rgba(155,100,255,.7);
+}
 
-  .slide-services.active .service-card:nth-child(1) { opacity: 1; transform: translateX(0); transition-delay: 0.15s; }
-  .slide-services.active .service-card:nth-child(2) { opacity: 1; transform: translateX(0); transition-delay: 0.3s; }
-  .slide-services.active .service-card:nth-child(3) { opacity: 1; transform: translateX(0); transition-delay: 0.45s; }
+/* Sous-titre listant les compétences de l'entreprise */
+.hero-sub{
+  margin-top: clamp(12px, 1.5vw, 32px);
+  font-size: clamp(11px, 1.2vw, 20px);
+  font-weight: 300;
+  color: rgba(255,255,255,.4);
+  letter-spacing: 0.3vw;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity .6s ease .5s;
+}
+.active .hero-sub{ opacity: 1; }
 
-  .card-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    background: rgba(155,89,245,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
+/* Ligne fine de séparation stylisée sous le bloc de titre */
+.hero-line{
+  width: clamp(60px, 6vw, 120px);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #9B59F5, transparent);
+  margin: clamp(16px, 1.8vw, 36px) auto;
+  opacity: 0;
+  transition: opacity .5s ease .65s;
+}
+.active .hero-line{ opacity: 1; }
 
-  .card-icon i { font-size: 16px; color: var(--dc-accent); }
+/* Coordonnées de contact affichées en bas de la première slide */
+.hero-contact{
+  font-size: clamp(11px, 1.1vw, 18px);
+  font-weight: 400;
+  color: rgba(200,167,255,.7);
+  letter-spacing: 1.5px;
+  opacity: 0;
+  transition: opacity .5s ease .8s;
+}
+.active .hero-contact{ opacity: 1; }
 
-  .card-body h4 {
-    font-size: 14px;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 3px;
-  }
 
-  .card-body p {
-    font-size: 11px;
-    color: rgba(255,255,255,0.45);
-    line-height: 1.4;
-  }
+/* ── DIAPOSITIVE 2 : GRILLE DES SERVICES (SLIDE 2) ──
+   Mise en page en deux colonnes (Row) asymétriques grâces aux flexbox */
+#s1{
+  padding: 0 8%;
+  flex-direction: row;
+  gap: 6%;
+  align-items: center;
+}
 
-  .left-visual {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 14px;
-  }
+/* Colonne de gauche (Titre de section et tags d'outils de conception) */
+.s2-left{
+  width: clamp(220px, 22vw, 400px);
+  flex-shrink: 0; /* Empêche cette colonne de se comprimer */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 30px 0;
+  border-right: 1px solid rgba(155,89,245,.15); /* Ligne verticale de démarcation */
+}
 
-  .tool-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    opacity: 0;
-    animation: none;
-  }
+/* Titre de la section "NOS SERVICES" */
+.s2-title{
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(38px, 4.5vw, 80px);
+  line-height: .9;
+  color: #fff;
+  margin-bottom: clamp(16px, 2vw, 32px);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity .5s ease .2s, transform .5s ease .2s;
+}
+.active .s2-title{ opacity: 1; transform: translateX(0); }
 
-  .slide-services.active .tool-row:nth-child(1) { opacity: 1; animation: fadeUp 0.5s ease 0.2s forwards; }
-  .slide-services.active .tool-row:nth-child(2) { opacity: 1; animation: fadeUp 0.5s ease 0.4s forwards; }
+/* Zone enveloppant les badges technologiques (Ai, Ae, Ps, Figma) */
+.tools-wrap{
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(6px, 0.6vw, 12px);
+  margin-bottom: clamp(16px, 2vw, 32px);
+  opacity: 0;
+  transition: opacity .5s ease .35s;
+}
+.active .tools-wrap{ opacity: 1; }
 
-  .tool-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1px;
-  }
+/* Style générique des badges logociels (Tags) */
+.tbadge{
+  padding: clamp(4px, 0.4vw, 8px) clamp(10px, 1vw, 20px);
+  border-radius: 30px;
+  font-size: clamp(10px, 1vw, 16px);
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+/* Déclinaisons de couleurs propres à chaque identité logicielle (Illustrator, After Effects, Photoshop, Figma) */
+.tAi{ background: rgba(255,112,0,.15); color: #FF7F35; border: 1px solid rgba(255,112,0,.35) }
+.tAe{ background: rgba(50,120,255,.15); color: #7AA8FF; border: 1px solid rgba(50,120,255,.35) }
+.tPs{ background: rgba(50,160,255,.15); color: #5BC8FF; border: 1px solid rgba(50,160,255,.35) }
+.tFi{ background: rgba(200,50,150,.15); color: #FF7ACC; border: 1px solid rgba(200,50,150,.35) }
 
-  .tb-orange { background: rgba(255,120,20,0.2); color: #FF9050; border: 1px solid rgba(255,120,20,0.4); }
-  .tb-blue { background: rgba(0,100,255,0.2); color: #6699FF; border: 1px solid rgba(0,100,255,0.4); }
-  .tb-purple { background: rgba(155,89,245,0.2); color: #C8A7FF; border: 1px solid rgba(155,89,245,0.4); }
-  .tb-pink { background: rgba(200,50,150,0.2); color: #FF80CC; border: 1px solid rgba(200,50,150,0.4); }
+.s2-desc{
+  font-size: clamp(12px, 1.1vw, 18px);
+  font-weight: 300;
+  color: rgba(255,255,255,.4);
+  line-height: 1.7;
+  opacity: 0;
+  transition: opacity .5s ease .45s;
+}
+.active .s2-desc{ opacity: 1; }
 
-  .left-desc {
-    font-size: 13px;
-    color: rgba(255,255,255,0.5);
-    line-height: 1.5;
-    margin-top: 8px;
-  }
+/* Colonne de droite (Liste verticale des cartes de prestations) */
+.s2-right{
+  flex: 1; /* Prend tout l'espace restant à droite */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(12px, 1.2vw, 24px);
+  padding-left: clamp(20px, 3vw, 60px);
+}
 
-  /* ——— SLIDE 3 : CONTACT ——— */
-  .slide-contact {
-    background: #0A0A1A;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
+/* Cartes individuelles des services */
+.svc-card{
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(155,89,245,.18);
+  border-radius: 12px;
+  padding: clamp(14px, 1.4vw, 28px) clamp(16px, 1.6vw, 32px);
+  display: flex;
+  gap: clamp(12px, 1.2vw, 24px);
+  align-items: flex-start;
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity .4s ease, transform .4s ease;
+  cursor: default;
+}
+/* Effet de survol (Hover) lumineux sur les cartes de service */
+.svc-card:hover{
+  background: rgba(108,63,197,.12);
+  border-color: rgba(155,89,245,.4);
+  transition: background .2s, border-color .2s;
+}
 
-  .contact-bg {
-    position: absolute;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(108,63,197,0.25) 0%, transparent 65%);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
+/* Cascades de délais d'animation (Stagger) pour faire apparaître les cartes l'une après l'autre */
+.active .svc-card:nth-child(1){ opacity: 1; transform: translateX(0); transition-delay: .15s; }
+.active .svc-card:nth-child(2){ opacity: 1; transform: translateX(0); transition-delay: .28s; }
+.active .svc-card:nth-child(3){ opacity: 1; transform: translateX(0); transition-delay: .41s; }
 
-  .contact-label {
-    font-size: 10px;
-    letter-spacing: 5px;
-    font-weight: 700;
-    color: var(--dc-violet);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    opacity: 0;
-    animation: none;
-  }
+/* Index numérique à l'intérieur des cartes (01, 02, 03) */
+.svc-num{
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(24px, 2.5vw, 44px);
+  color: rgba(155,89,245,.35);
+  line-height: 1;
+  flex-shrink: 0;
+  width: clamp(30px, 3vw, 50px);
+}
+.svc-body h4{ font-size: clamp(13px, 1.3vw, 22px); font-weight: 600; color: #fff; margin-bottom: 6px; }
+.svc-body p{ font-size: clamp(11px, 1.1vw, 16px); font-weight: 300; color: rgba(255,255,255,.4); line-height: 1.5; }
 
-  .slide-contact.active .contact-label { animation: fadeUp 0.5s ease 0.1s forwards; }
 
-  .contact-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 52px;
-    color: white;
-    letter-spacing: 3px;
-    margin-bottom: 30px;
-    opacity: 0;
-    animation: none;
-  }
+/* ── DIAPOSITIVE 3 : MODULE DE CONTACT (SLIDE 3) ── */
+#s2{ gap:0; }
 
-  .slide-contact.active .contact-title { animation: fadeUp 0.5s ease 0.2s forwards; }
+.ct-title{
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(44px, 5.5vw, 90px);
+  letter-spacing: 4px;
+  color: #fff;
+  margin-bottom: clamp(24px, 2.5vw, 48px);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .6s ease .2s, transform .6s ease .2s;
+}
+.active .ct-title{ opacity: 1; transform: translateY(0); }
 
-  .contact-grid {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 28px;
-    opacity: 0;
-    animation: none;
-  }
+/* Grille contenant les blocs informatifs Téléphone et E-mail */
+.ct-cards{
+  display: flex;
+  gap: clamp(16px, 2vw, 36px);
+  margin-bottom: clamp(24px, 2.5vw, 48px);
+  opacity: 0;
+  transition: opacity .5s ease .35s;
+}
+.active .ct-cards{ opacity: 1; }
 
-  .slide-contact.active .contact-grid { animation: fadeUp 0.5s ease 0.35s forwards; }
+/* Blocs de contact individuels */
+.ct-card{
+  background: rgba(155,89,245,.08);
+  border: 1px solid rgba(155,89,245,.22);
+  border-radius: 14px;
+  padding: clamp(18px, 2vw, 36px) clamp(24px, 2.5vw, 50px);
+  text-align: center;
+  min-width: clamp(160px, 16vw, 280px);
+}
+.ct-card i{ font-size: clamp(22px, 2.2vw, 40px); color: #9B59F5; display: block; margin-bottom: 10px; }
+.ct-clabel{ font-size: clamp(9px, 0.9vw, 14px); letter-spacing: 3px; color: rgba(255,255,255,.35); text-transform: uppercase; margin-bottom: 6px; }
+.ct-cval{ font-size: clamp(12px, 1.2vw, 20px); font-weight: 600; color: #fff; }
 
-  .contact-item {
-    background: rgba(155,89,245,0.1);
-    border: 1px solid rgba(155,89,245,0.25);
-    border-radius: 10px;
-    padding: 16px 22px;
-    text-align: center;
-    min-width: 160px;
-  }
+/* Grand affichage du numéro principal en base de slide */
+.ct-phone{
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 4.5vw, 76px);
+  letter-spacing: 4px;
+  color: #C8A7FF;
+  opacity: 0;
+  transition: opacity .5s ease .5s;
+}
+.active .ct-phone{ opacity: 1; }
 
-  .contact-item i { font-size: 20px; color: var(--dc-violet); margin-bottom: 6px; display: block; }
-  .contact-item .ci-label { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 4px; }
-  .contact-item .ci-value { font-size: 14px; font-weight: 700; color: white; }
 
-  .phone-big {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 38px;
-    letter-spacing: 3px;
-    color: var(--dc-accent);
-    opacity: 0;
-    animation: none;
-  }
+/* ── BARRE DE CONTRÔLES / NAVIGATION ── */
+#controls{
+  position: absolute;
+  bottom: clamp(16px, 2.5vw, 48px);
+  left: 50%;
+  transform: translateX(-50%); /* Centrage absolu exact horizontal */
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
 
-  .slide-contact.active .phone-big { animation: fadeUp 0.5s ease 0.5s forwards; }
+/* Boutons de navigation (Précédent / Suivant) */
+.cbtn{
+  width: clamp(32px, 3vw, 48px);
+  height: clamp(32px, 3vw, 48px);
+  border-radius: 50%;
+  border: 1px solid rgba(155,89,245,.3);
+  background: rgba(155,89,245,.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #C8A7FF;
+  transition: background .2s;
+}
+.cbtn:hover{ background: rgba(155,89,245,.28); }
+.cbtn i{ font-size: clamp(14px, 1.2vw, 20px); }
 
-  /* ——— CONTROLS ——— */
-  .controls {
-    position: absolute;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 10;
-  }
+/* Conteneur des puces indicatrices de position (Dots) */
+.cdots{ display: flex; gap: 10px; align-items: center; }
 
-  .ctrl-btn {
-    background: rgba(155,89,245,0.15);
-    border: 1px solid rgba(155,89,245,0.3);
-    border-radius: 50%;
-    width: 30px; height: 30px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    color: var(--dc-accent);
-    transition: background 0.2s;
-  }
+/* Style par défaut d'une puce inactive */
+.cdot{
+  width: clamp(6px, 0.6vw, 10px);
+  height: clamp(6px, 0.6vw, 10px);
+  border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  cursor: pointer;
+  transition: all .35s;
+}
+/* Style étiré et illuminé représentant la puce de la slide courante */
+.cdot.on{
+  width: clamp(22px, 2vw, 36px);
+  border-radius: 6px;
+  background: #9B59F5;
+}
 
-  .ctrl-btn:hover { background: rgba(155,89,245,0.3); }
-  .ctrl-btn i { font-size: 14px; }
+/* Compteur textuel (ex: "01 / 03") disposé en haut à droite */
+#counter{
+  position: absolute;
+  top: clamp(20px, 2.2vw, 46px);
+  right: clamp(24px, 3vw, 60px);
+  z-index: 10;
+  font-size: clamp(11px, 1.1vw, 18px);
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,.25);
+}
 
-  .dots { display: flex; gap: 6px; }
-
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .dot.active { background: var(--dc-violet); width: 20px; border-radius: 3px; }
-
-  /* ——— SLIDE COUNTER ——— */
-  .slide-counter {
-    position: absolute;
-    top: 14px; right: 18px;
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-    letter-spacing: 2px;
-    font-weight: 600;
-    z-index: 10;
-  }
-
-  /* ——— LOGO ——— */
-  .logo-badge {
-    position: absolute;
-    top: 14px; left: 18px;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .logo-icon {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    background: rgba(155,89,245,0.3);
-    border: 1px solid rgba(155,89,245,0.5);
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .logo-icon i { font-size: 15px; color: var(--dc-accent); }
-  .logo-text { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+/* Ligne fine indicatrice de progression automatique temporelle (Barre de chargement en base d'écran) */
+#prog{
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6C3FC5, #C8A7FF);
+  z-index: 10;
+  transition: width .1s linear; /* Transition linaire synchrone avec l'intervalle JS */
+}
 </style>
 
-<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Présentation animée Data Corporation — services professionnels en design graphique et développement web</h2>
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Data Corporation — présentation interactive avec animations</h2>
 
-<div class="presentation">
+<div id="stage">
+  <canvas id="bg"></canvas>
+  <canvas id="grain"></canvas>
+  
+  <div id="scan"></div>
+  <div id="vig"></div>
 
-  <div class="logo-badge">
-    <div class="logo-icon"><i class="ti ti-brand-databricks" aria-hidden="true"></i></div>
-    <span class="logo-text">DATA CORP.</span>
-  </div>
-
-  <div class="slide-counter" id="counterDisplay">01 / 03</div>
-
-  <!-- SLIDE 1 : HERO -->
-  <div class="slide slide-hero active" id="slide0">
-    <div class="hero-bg-circle c1"></div>
-    <div class="hero-bg-circle c2"></div>
-    <p class="hero-tag">Service Professionnel</p>
-    <h1 class="hero-title">DATA<br><span>CORPORATION</span></h1>
-    <p class="hero-sub">Design · Développement · Branding</p>
-    <p class="hero-contact">+225 07 685 13447 &nbsp;·&nbsp; data.corporation10@gmail.com</p>
-  </div>
-
-  <!-- SLIDE 2 : SERVICES -->
-  <div class="slide slide-services" id="slide1">
-    <div class="services-left">
-      <p class="section-label">Expertise</p>
-      <h2 class="section-title">NOS<br>SERVICES</h2>
-      <div class="left-visual">
-        <div class="tool-row">
-          <span class="tool-badge tb-orange">Ai</span>
-          <span class="tool-badge tb-blue">Ae</span>
-          <span class="tool-badge tb-pink">Ps</span>
-          <span class="tool-badge tb-purple">Figma</span>
-        </div>
-        <p class="left-desc">Solutions créatives complètes<br>pour votre identité digitale.</p>
+  <div id="topbar">
+    <div id="logobadge">
+      <div id="logoimg">
+        <img src="LOGO Datacorporation.png" alt="LOGO Datacorporation.png">
       </div>
+      <span id="logotxt">DATA CORP.</span>
     </div>
-    <div class="services-right">
-      <div class="service-card">
-        <div class="card-icon"><i class="ti ti-code" aria-hidden="true"></i></div>
-        <div class="card-body">
-          <h4>Webmaster & Programmation</h4>
-          <p>Création de sites, applications, maintenance</p>
-        </div>
+  </div>
+
+  <div id="counter">01 / 03</div>
+  <div id="prog" style="width:0%"></div>
+
+  <div class="slide active" id="s0">
+    <p class="hero-eyebrow">Service Professionnel</p>
+    <h1 class="hero-name">DATA<br><em>CORPORATION</em></h1>
+    <p class="hero-sub">Design &nbsp;·&nbsp; Développement &nbsp;·&nbsp; Branding</p>
+    <div class="hero-line"></div>
+    <p class="hero-contact">+225 XX XX XX XX XX &nbsp;&nbsp;·&nbsp;&nbsp; XXXXXXXXXX@gmail.com</p>
+  </div>
+
+  <div class="slide" id="s1">
+    <div class="s2-left">
+      <p class="s2-eyebrow">Expertise</p>
+      <h2 class="s2-title">NOS<br>SERVICES</h2>
+      <div class="tools-wrap">
+        <span class="tbadge tAi">Ai</span>
+        <span class="tbadge tAe">Ae</span>
+        <span class="tbadge tPs">Ps</span>
+        <span class="tbadge tFi">Figma</span>
       </div>
-      <div class="service-card">
-        <div class="card-icon"><i class="ti ti-palette" aria-hidden="true"></i></div>
-        <div class="card-body">
-          <h4>Design Graphique</h4>
-          <p>Affiches, flyers, logos, branding, maquettes</p>
-        </div>
+      <p class="s2-desc">Solutions créatives<br>pour votre identité digitale.</p>
+    </div>
+    <div class="s2-right">
+      <div class="svc-card">
+        <div class="svc-num">01</div>
+        <div class="svc-body"><h4>Webmaster &amp; Programmation</h4><p>Sites, applications, maintenance</p></div>
       </div>
-      <div class="service-card">
-        <div class="card-icon"><i class="ti ti-video" aria-hidden="true"></i></div>
-        <div class="card-body">
-          <h4>Montage Vidéo</h4>
-          <p>Réalisation, effets visuels, animations</p>
-        </div>
+      <div class="svc-card">
+        <div class="svc-num">02</div>
+        <div class="svc-body"><h4>Design Graphic</h4><p>Affiches, flyers, logos, branding</p></div>
+      </div>
+      <div class="svc-card">
+        <div class="svc-num">03</div>
+        <div class="svc-body"><h4>Montage Vidéo</h4><p>Réalisation, effets visuels, animations</p></div>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 3 : CONTACT -->
-  <div class="slide slide-contact" id="slide2">
-    <div class="contact-bg"></div>
-    <p class="contact-label">Travaillons ensemble</p>
-    <h2 class="contact-title">CONTACTEZ-NOUS</h2>
-    <div class="contact-grid">
-      <div class="contact-item">
+  <div class="slide" id="s2">
+    <p class="ct-eyebrow">Travaillons ensemble</p>
+    <h2 class="ct-title">CONTACTEZ-NOUS</h2>
+    <div class="ct-cards">
+      <div class="ct-card">
         <i class="ti ti-phone" aria-hidden="true"></i>
-        <div class="ci-label">Téléphone</div>
-        <div class="ci-value">+225 07 685 13447</div>
+        <div class="ct-clabel">Téléphone</div>
+        <div class="ct-cval">+225 XX XX XX XX XX</div>
       </div>
-      <div class="contact-item">
+      <div class="ct-card">
         <i class="ti ti-mail" aria-hidden="true"></i>
-        <div class="ci-label">Email</div>
-        <div class="ci-value">data.corporation10@gmail.com</div>
+        <div class="ct-clabel">Email</div>
+        <div class="ct-cval">XXXXXXXXXX@gmail.com</div>
       </div>
     </div>
-    <p class="phone-big">+225 07 685 13447</p>
+    <p class="ct-phone">+225 XX XX XX XX XX</p>
   </div>
 
-  <!-- CONTROLS -->
-  <div class="controls">
-    <button class="ctrl-btn" id="prevBtn" aria-label="Slide précédente">
-      <i class="ti ti-chevron-left" aria-hidden="true"></i>
-    </button>
-    <div class="dots">
-      <div class="dot active" onclick="goTo(0)"></div>
-      <div class="dot" onclick="goTo(1)"></div>
-      <div class="dot" onclick="goTo(2)"></div>
+  <div id="controls">
+    <button class="cbtn" id="prev" aria-label="Précédent"><i class="ti ti-chevron-left" aria-hidden="true"></i></button>
+    <div class="cdots">
+      <div class="cdot on" onclick="goTo(0)"></div>
+      <div class="cdot" onclick="goTo(1)"></div>
+      <div class="cdot" onclick="goTo(2)"></div>
     </div>
-    <button class="ctrl-btn" id="nextBtn" aria-label="Slide suivante">
-      <i class="ti ti-chevron-right" aria-hidden="true"></i>
-    </button>
+    <button class="cbtn" id="next" aria-label="Suivant"><i class="ti ti-chevron-right" aria-hidden="true"></i></button>
   </div>
-
 </div>
 
 <script>
-  let current = 0;
-  const total = 3;
-  const slides = document.querySelectorAll('.slide');
-  const dots = document.querySelectorAll('.dot');
-  const counter = document.getElementById('counterDisplay');
+// Encapsulation du code dans une fonction anonyme à exécution immédiate (IIFE) 
+// pour isoler les variables et éviter de polluer l'espace global du navigateur.
+(function(){
 
-  function goTo(n) {
-    slides[current].classList.remove('active');
-    slides[current].classList.add('exit');
-    setTimeout(() => slides[current].classList.remove('exit'), 600);
-    dots[current].classList.remove('active');
+// W (Width) et H (Height) contiendront en temps réel la taille de la fenêtre de navigation
+let W, H;
+// Index du slide actuel (0, 1, ou 2)
+let cur=0;
+// Nombre total de slides dans la présentation
+let total=3;
+// Variable réservée au stockage de l'instance de l'intervalle d'auto-rotation
+let auto;
+// Niveau d'avancement de la barre de progression (de 0 à 100)
+let progVal=0;
+// Variable booléenne pour figer l'avancement temporel si l'utilisateur survole le stage
+let paused=false;
+// Temps d'affichage imparti par slide (6000ms = 6 secondes)
+const DURATION=6000;
 
-    current = (n + total) % total;
+// Sélection et mise en mémoire des éléments du DOM indispensables aux manipulations
+const slides=document.querySelectorAll('.slide');
+const dots=document.querySelectorAll('.cdot');
+const counter=document.getElementById('counter');
+const prog=document.getElementById('prog');
+const stage=document.getElementById('stage');
+const cv=document.getElementById('bg');
+const ctx=cv.getContext('2d'); // Extraction du contexte 2D pour exécuter les dessins sur le canvas d'arrière-plan
 
-    slides[current].classList.add('active');
-    dots[current].classList.add('active');
-    counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+// Fonction utilitaire ajoutant un zéro de synchronisation devant un chiffre inférieur à 10 (ex: 1 devient "01")
+function pad(n){return String(n).padStart(2,'0')}
+
+// Fonction centrale gérant la transition vers un slide arbitraire "n"
+function goTo(n){
+  // Supprime la classe d'activité du slide et du point de contrôle courants
+  slides[cur].classList.remove('active');
+  dots[cur].classList.remove('on');
+  
+  // Formule mathématique calculant le nouvel index (gère le rebond circulaire si n < 0 ou n > total)
+  cur=(n+total)%total;
+  
+  // Injecte la classe d'activité sur le nouveau slide ciblé et son point correspondant
+  slides[cur].classList.add('active');
+  dots[cur].classList.add('on');
+  
+  // Actualise l'état textuel du compteur en haut à droite
+  counter.textContent=pad(cur+1)+' / '+pad(total);
+  // Remet à zéro la jauge de chargement visuelle lors du changement
+  progVal=0;
+}
+
+// Écouteurs de clics pour les boutons de navigation Précédent / Suivant
+document.getElementById('prev').addEventListener('click',()=>{resetTimer();goTo(cur-1)});
+document.getElementById('next').addEventListener('click',()=>{resetTimer();goTo(cur+1)});
+
+// Fonction arrêtant momentanément l'horloge système automatique pour la relancer proprement
+function resetTimer(){clearInterval(auto);progVal=0;startTimer()}
+
+// Initialise le rafraîchissement récurrent de la jauge d'auto-balayage des slides
+function startTimer(){
+  auto=setInterval(()=>{
+    // La progression s'exécute uniquement si le diaporama n'est pas suspendu par un survol de souris
+    if(!paused){
+      // Calcule le pas d'incrémentation nécessaire à chaque pas de 50ms pour atteindre 100% au bout de DURATION ms
+      progVal+=100/(DURATION/50);
+      // Met à jour la largeur graphique CSS de la barre de progression
+      prog.style.width=Math.min(progVal,100)+'%';
+      // Dès que la progression atteint ou dépasse 100%, réinitialisation et saut au slide suivant
+      if(progVal>=100){progVal=0;goTo(cur+1)}
+    }
+  },50); // Rafraîchissement cadencé à 50 millisecondes
+}
+
+// Événements liés au survol pour suspendre ou reprendre le défilement automatique
+stage.addEventListener('mouseenter',()=>{paused=true});
+stage.addEventListener('mouseleave',()=>{paused=false});
+
+// Lancement initial de la minuterie globale
+startTimer();
+
+/* ── MODULE DE REDIMENSIONNEMENT DYNAMIQUE ── 
+   Réajuste la géométrie interne de l'application lors des changements d'échelle d'écran */
+function resize() {
+  W = window.innerWidth;  // Récupère la largeur réelle du navigateur
+  H = window.innerHeight; // Récupère la hauteur réelle du navigateur
+  cv.width = W;           // Assigne la largeur physique de dessin au Canvas
+  cv.height = H;          // Assigne la hauteur physique de dessin au Canvas
+  
+  // Sécurité : Repositionne aléatoirement les particules égarées en dehors des limites après un rétrécissement soudain
+  if(pts) {
+    pts.forEach(p => {
+      if(p.x > W) p.x = Math.random() * W;
+      if(p.y > H) p.y = Math.random() * H;
+    });
+  }
+}
+
+/* ── CONFIGURATION DES PARTICULES DU BACKDROP ── */
+const N=90; // Volume de nœuds (particules) en mouvement simultané dans l'univers
+// Génération assistée d'un tableau d'objets stockant les attributs individuels des particules
+const pts=Array.from({length:N},()=>({
+  x: Math.random()*window.innerWidth,  // Coordonnée horizontale aléatoire de départ
+  y: Math.random()*window.innerHeight, // Coordonnée verticale aléatoire de départ
+  r: Math.random()*1.4+.3,             // Rayon physique de la particule (taille variable entre 0.3 et 1.7 pixels)
+  vx: (Math.random()-.5)*.3,           // Vecteur de vélocité sur l'axe X (vitesse et sens de translation)
+  vy: (Math.random()-.5)*.3,           // Vecteur de vélocité sur l'axe Y
+  a: Math.random()                     // Opacité de base aléatoire (Alpha)
+}));
+
+// Exécution d'un premier calibrage structurel
+resize();
+// Branchement de l'écouteur d'événement pour relancer le calcul à chaque altération géométrique de l'écran
+window.addEventListener('resize', resize);
+
+/* ── GESTION DES ÉTOILES FILANTES (SHOOTING STARS) ── */
+const stars=[]; // Registre répertoriant les météores actifs à l'écran
+function spawnStar(){
+  // Injection périodique d'une entité météore avec ses variables cinétiques propres
+  stars.push({
+    x: Math.random()*W, // Point de genèse sur l'axe horizontal
+    y: 0,               // Apparition systématique au sommet du viewport
+    len: Math.random()*80+40,  // Longueur du sillage lumineux
+    speed: Math.random()*4+3,  // Vitesse de chute
+    a: 1,                      // Alpha de départ à intensité maximale
+    w: Math.random()*1+.5      // Épaisseur du trait de lumière
+  });
+}
+// Génère de façon itérative une nouvelle étoile filante toutes les 1.8 secondes
+setInterval(spawnStar,1800);
+
+let blobT=0; // Variable temporelle incrémentielle régissant les oscillations fluides des nébuleuses
+
+/* Fonction graphique traçant un hexagone régulier parfait dans le contexte du Canvas
+   cx/cy: coordonnées du centre; size: rayon externe; alpha: opacité du contour */
+function drawHex(cx,cy,size,alpha){
+  ctx.beginPath();
+  for(let i=0;i<6;i++){
+    // Conversion en coordonnées polaires appliquées sur 6 sommets inclinés de 60 degrés en 60 degrés
+    const a=Math.PI/180*(60*i-30);
+    i===0 ? ctx.moveTo(cx+size*Math.cos(a),cy+size*Math.sin(a)) : ctx.lineTo(cx+size*Math.cos(a),cy+size*Math.sin(a));
+  }
+  ctx.closePath();
+  ctx.strokeStyle=`rgba(155,89,245,${alpha})`; // Couleur du contour (Violet)
+  ctx.lineWidth=.4;
+  ctx.stroke(); // Dessine la ligne
+}
+
+/* ── BOUCLE D'ANIMATION PRINCIPALE (ANIMATION FRAME) ── 
+   S'exécute de manière synchrone avec le taux de rafraîchissement natif de l'écran (60fps à 120fps+) */
+function frame(){
+  // Nettoyage complet de la frame précédente en ré-appliquant un fond noir opaque
+  ctx.fillStyle='#000';
+  ctx.fillRect(0,0,W,H);
+
+  // Évolution de l'horloge interne des nébuleuses
+  blobT+=.004;
+  
+  // Tableau dynamique recalculant le centre et le rayon des nébuleuses par rapport à l'échelle W et H actuelle
+  const dynamicBlobs=[
+    {x:W*.25, y:H*.35, r:Math.max(W,H)*.25, c:'rgba(108,63,197,'}, // Blob violet sombre en haut à gauche
+    {x:W*.75, y:H*.6,  r:Math.max(W,H)*.22, c:'rgba(155,89,245,'}, // Blob rose/violet clair en bas à droite
+    {x:W*.5,  y:H*.1,  r:Math.max(W,H)*.18, c:'rgba(70,30,140,'}   // Blob violet profond en haut au centre
+  ];
+
+  // Dessin des 3 amas de gaz (Nébuleuses) à l'aide de dégradés radiaux imbriqués
+  dynamicBlobs.forEach((b,i)=>{
+    // Modulations trigonométriques pour animer doucement le centre des nébuleuses
+    const ox=Math.sin(blobT+i*2.1)*30;
+    const oy=Math.cos(blobT+i*1.7)*20;
+    
+    // Génération du dégradé radial (Source lumineuse opaque au centre s'estompant vers les bords)
+    const g=ctx.createRadialGradient(b.x+ox,b.y+oy,0,b.x+ox,b.y+oy,b.r);
+    g.addColorStop(0,b.c+'.15)'); // Épicentre de la nébuleuse légèrement lumineuse
+    g.addColorStop(1,b.c+'0)');   // Évanouissement total en périphérie
+    ctx.fillStyle=g;
+    
+    // Dessin de la forme étirée (ellipse) pour un rendu gazeux organique asymétrique
+    ctx.beginPath();
+    ctx.ellipse(b.x+ox,b.y+oy,b.r,b.r*.7,blobT*.3,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  /* Rendu de la trame de fond hexagonale subtile */
+  const hs=44; // Distance séparant les nœuds de la grille
+  for(let col=-1;col<W/hs+1;col++){
+    for(let row=-1;row<H/(hs*.87)+1;row++){
+      // Calcul géométrique du décalage requis pour imbriquer les alvéoles de la grille hexagonale
+      const hx=col*hs*1.5+(row%2)*hs*.75;
+      const hy=row*hs*.87;
+      
+      // Calcule l'éloignement de la cellule par rapport au barycentre de l'écran
+      const d=Math.hypot(hx-W/2,hy-H/2);
+      // Formule générant une pulsation lumineuse ondulatoire localisée au centre de l'affichage
+      const a=Math.max(0,.025-d/12000)*Math.abs(Math.sin(blobT+col*.3+row*.4));
+      
+      // Seuil de coupure pour économiser les ressources processeur des tracés imperceptibles
+      if(a>.002) drawHex(hx,hy,hs*.5,a);
+    }
   }
 
-  document.getElementById('prevBtn').addEventListener('click', () => goTo(current - 1));
-  document.getElementById('nextBtn').addEventListener('click', () => goTo(current + 1));
+  /* Rendu des lignes de constellations (Interconnections de proximité) */
+  ctx.lineWidth=.4;
+  for(let i=0;i<N;i++){
+    for(let j=i+1;j<N;j++){
+      // Évalue la distance cartésienne absolue unissant la particule i et la particule j
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d=Math.hypot(dx,dy);
+      
+      // Si la distance mesurée passe sous la barre critique des 110 pixels, une ligne s'établit
+      if(d<110){
+        // L'intensité lumineuse du filament s'amenuise au fur et à mesure que l'écart grandit
+        const a=(1-d/110)*.2;
+        ctx.strokeStyle=`rgba(155,89,245,${a})`;
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x,pts[i].y);
+        ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.stroke();
+      }
+    }
+  }
 
-  let autoTimer = setInterval(() => goTo(current + 1), 5000);
-  document.querySelector('.presentation').addEventListener('mouseenter', () => clearInterval(autoTimer));
-  document.querySelector('.presentation').addEventListener('mouseleave', () => {
-    autoTimer = setInterval(() => goTo(current + 1), 5000);
+  /* Dessin et déplacement des étoiles/particules individuelles */
+  pts.forEach(p=>{
+    // Incrémente la position selon l'impulsion physique vectorielle calculée initialement
+    p.x+=p.vx; p.y+=p.vy;
+    
+    // Algorithmes de rebond de géolocalisation infini (Téléportation si dépassement de frontière)
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    
+    // Scintillation aléatoire de l'éclat de l'étoile basée sur une fonction sinus temporelle
+    p.a=.4+.4*Math.abs(Math.sin(blobT*2+p.x));
+    
+    // Tracé du micro-cercle représentant le point stellaire
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(200,167,255,${p.a*.6})`;
+    ctx.fill();
   });
+
+  /* Traitement visuel et rendu balistique des étoiles filantes */
+  for(let i=stars.length-1;i>=0;i--){
+    const s=stars[i];
+    // Progression diagonale descendante indexée sur la vélocité intrinsèque du météore
+    s.x+=s.speed*.7; s.y+=s.speed;
+    // Dissipation progressive du météore à chaque pas de calcul
+    s.a-=.018;
+    
+    // Dès que le météore est totalement invisible, il est détruit pour préserver l'allocation mémoire
+    if(s.a<=0){stars.splice(i,1);continue}
+    
+    // Création d'un gradient linéaire linéaire le long du sillage pour donner un effet de vitesse de traînée
+    const g=ctx.createLinearGradient(s.x,s.y,s.x-s.len*.5,s.y-s.len);
+    g.addColorStop(0,`rgba(200,167,255,${s.a})`); // Tête incandescente de l'étoile filante
+    g.addColorStop(1,'rgba(200,167,255,0)');       // Queue évanescente
+    
+    ctx.strokeStyle=g;
+    ctx.lineWidth=s.w;
+    ctx.beginPath();
+    ctx.moveTo(s.x,s.y);
+    ctx.lineTo(s.x-s.len*.5,s.y-s.len); // Tracé rectiligne oblique du vecteur de déplacement
+    ctx.stroke();
+  }
+
+  // Rappelle de manière cyclique récursive la fonction frame() dès que l'écran est disponible pour rafraîchir le dessin
+  requestAnimationFrame(frame);
+}
+// Amorce de la première exécution du cycle d'animation
+frame();
+
+/* ── SIMULATION DU BRUIT DE GRAIN INTEMPOREL (NOISE GRAIN) ── */
+const gc=document.getElementById('grain');
+// Définition d'un repère matriciel compact de 180x180 pixels pour optimiser les performances de calcul par le CPU
+gc.width=180; gc.height=180;
+const gx=gc.getContext('2d');
+
+function noise(){
+  // Allocation directe d'une matrice brute de pixels d'image mémoire de 180x180
+  const id=gx.createImageData(180,180);
+  // Itération pas à pas sur le canal de données RGBA (4 octets par pixel : Rouge, Vert, Bleu, Alpha)
+  for(let i=0;i<id.data.length;i+=4){
+    // Injection d'une nuance monochrome grisâtre/blanche aléatoire (de 0 à 255) obtenue par manipulation binaire
+    const v=Math.random()*255|0;
+    id.data[i]=id.data[i+1]=id.data[i+2]=v; // Assigne la valeur aux composantes RVB
+    id.data[i+3]=255;                       // Canal Alpha réglé au maximum d'opacité
+  }
+  // Injecte la matrice de pixels générée directement sur le canvas de grain
+  gx.putImageData(id,0,0);
+  
+  // Applique de légères vibrations CSS transformationnelles asynchrones (jitter) pour simuler le sautillement d'une pellicule de film
+  gc.style.transform=`translate(${(Math.random()*4|0)}px,${(Math.random()*4|0)}px)`;
+}
+// Exécute et régénère la texture de bruit à un intervalle cadencé de 80 millisecondes
+setInterval(noise,80);
+noise(); // Lancement immédiat
+
+})();
 </script>
