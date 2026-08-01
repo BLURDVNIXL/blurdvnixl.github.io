@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TD Python — Préparation à l'Évaluation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161920;
+    --surface2: #1e2230;
+    --border: #2a2f40;
+    --accent: #5effa0;
+    --accent2: #ff6b6b;
+    --accent3: #ffd166;
+    --accent4: #74b9ff;
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --code-bg: #0a0c10;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(94,255,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(94,255,160,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 32px;
+    margin-bottom: 56px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .header-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+  }
+
+  .badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .badge.green { color: var(--accent); border-color: var(--accent); }
+  .badge.red { color: var(--accent2); border-color: var(--accent2); }
+  .badge.yellow { color: var(--accent3); border-color: var(--accent3); }
+  .badge.blue { color: var(--accent4); border-color: var(--accent4); }
+
+  /* Progress nav */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 56px;
+    animation: fadeDown 0.7s 0.1s ease both;
+  }
+
+  .toc h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+  }
+
+  .toc-item:hover { background: var(--surface2); }
+
+  .toc-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 24px;
+  }
+
+  /* Exercise blocks */
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 56px 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .exercise {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 32px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+    transition: border-color 0.3s;
+  }
+
+  .exercise:hover { border-color: rgba(94,255,160,0.3); }
+
+  .ex-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .ex-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 44px;
+    line-height: 1;
+  }
+
+  .ex-title-wrap { flex: 1; }
+
+  .ex-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .ex-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .ex-body { padding: 24px 28px; }
+
+  .ex-body p { color: #c0c8d8; font-size: 14px; margin-bottom: 12px; }
+  .ex-body ol, .ex-body ul { padding-left: 20px; color: #c0c8d8; font-size: 14px; }
+  .ex-body li { margin-bottom: 8px; }
+
+  code, .code-block {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    color: var(--accent3);
+  }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin: 16px 0;
+    overflow-x: auto;
+    white-space: pre;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #c0c8d8;
+  }
+
+  .code-block .kw { color: #c792ea; }
+  .code-block .fn { color: #82aaff; }
+  .code-block .str { color: var(--accent); }
+  .code-block .num { color: var(--accent3); }
+  .code-block .cm { color: var(--muted); font-style: italic; }
+  .code-block .var { color: #ff6b6b; }
+
+  /* Hint / Retenir */
+  .retenir {
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid;
+  }
+
+  .retenir.green { border-color: rgba(94,255,160,0.3); background: rgba(94,255,160,0.05); }
+  .retenir.yellow { border-color: rgba(255,209,102,0.3); background: rgba(255,209,102,0.05); }
+  .retenir.blue { border-color: rgba(116,185,255,0.3); background: rgba(116,185,255,0.05); }
+  .retenir.red { border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05); }
+
+  .retenir-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .retenir.green .retenir-header { color: var(--accent); border-color: rgba(94,255,160,0.2); }
+  .retenir.yellow .retenir-header { color: var(--accent3); border-color: rgba(255,209,102,0.2); }
+  .retenir.blue .retenir-header { color: var(--accent4); border-color: rgba(116,185,255,0.2); }
+  .retenir.red .retenir-header { color: var(--accent2); border-color: rgba(255,107,107,0.2); }
+
+  .retenir-body {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #c0c8d8;
+    display: none;
+  }
+
+  .retenir-body.visible { display: block; }
+  .retenir-body ul { padding-left: 18px; }
+  .retenir-body li { margin-bottom: 6px; }
+
+  .toggle-icon { margin-left: auto; transition: transform 0.3s; }
+  .rotated { transform: rotate(180deg); }
+
+  /* Answer toggle */
+  .answer-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .answer-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+  .answer { display: none; margin-top: 12px; }
+  .answer.visible { display: block; }
+
+  /* Divider */
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .ex-header { flex-direction: column; }
+    .toc-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-tag">// Chapitres 7 &amp; 8 — Informatique</div>
+    <h1>TD <span>Python</span><br>Préparation Évaluation</h1>
+    <div class="header-meta">
+      <span>Chapitre 7 : Bases du langage Python</span>
+      <span>•</span>
+      <span>Chapitre 8 : Calcul scientifique &amp; NumPy</span>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
+      <span class="badge green">✦ Débutant</span>
+      <span class="badge yellow">◆ Intermédiaire</span>
+      <span class="badge red">▲ Avancé</span>
+      <span class="badge blue">⊕ NumPy</span>
+    </div>
+  </header>
+
+  <!-- TABLE DES MATIÈRES -->
+  <div class="toc">
+    <h3>// Sommaire des exercices</h3>
+    <div class="toc-grid">
+      <a href="#ex1" class="toc-item"><span class="toc-num">01</span> Calculs &amp; Affectations</a>
+      <a href="#ex2" class="toc-item"><span class="toc-num">02</span> Entrées / Sorties</a>
+      <a href="#ex3" class="toc-item"><span class="toc-num">03</span> Variables &amp; Types</a>
+      <a href="#ex4" class="toc-item"><span class="toc-num">04</span> Types immuables</a>
+      <a href="#ex5" class="toc-item"><span class="toc-num">05</span> Chaînes de caractères</a>
+      <a href="#ex6" class="toc-item"><span class="toc-num">06</span> Listes &amp; Tuples</a>
+      <a href="#ex7" class="toc-item"><span class="toc-num">07</span> Dictionnaires</a>
+      <a href="#ex8" class="toc-item"><span class="toc-num">08</span> Conditions</a>
+      <a href="#ex9" class="toc-item"><span class="toc-num">09</span> Boucles</a>
+      <a href="#ex10" class="toc-item"><span class="toc-num">10</span> Fonctions</a>
+      <a href="#ex11" class="toc-item"><span class="toc-num">11</span> Compréhension listes</a>
+      <a href="#ex12" class="toc-item"><span class="toc-num">12</span> NumPy</a>
+    </div>
+  </div>
+
+  <!-- =========== PARTIE 1 =========== -->
+  <div class="section-title">Partie 1 — Bases fondamentales</div>
+
+  <!-- EX 1 -->
+  <div class="exercise" id="ex1">
+    <div class="ex-header">
+      <div class="ex-num">01</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Calculs, Opérations &amp; Affectations</div>
+        <div class="ex-tags">
+          <span class="badge green">✦ Débutant</span>
+          <span class="badge" style="color:var(--muted)">§ 7.1 · 7.2</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Répondre aux questions suivantes <strong>sans exécuter le code</strong>, puis vérifier en Python :</p>
+      <ol>
+        <li>Quelle est la valeur de <code>7 // 2</code> ? Et de <code>7 % 2</code> ?</li>
+        <li>Que vaut <code>2 ** 10</code> ?</li>
+        <li>Écrire une instruction qui permute les valeurs de deux variables <code>a = 5</code> et <code>b = 3</code> <em>en une seule ligne</em>.</li>
+        <li>Que vaut <code>x</code> après : <code>x = 10 ; x += 3 ; x *= 2</code> ?</li>
+        <li>Quelle différence entre <code>3/2</code> et <code>3//2</code> en Python 3 ?</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="cm"># 1.</span>
+<span class="num">7</span> // <span class="num">2</span>  <span class="cm"># → 3  (division entière)</span>
+<span class="num">7</span> %  <span class="num">2</span>  <span class="cm"># → 1  (reste / modulo)</span>
+
+<span class="cm"># 2.</span>
+<span class="num">2</span> ** <span class="num">10</span> <span class="cm"># → 1024</span>
+
+<span class="cm"># 3. Permutation en une ligne (unpacking)</span>
+<span class="var">a</span>, <span class="var">b</span> = <span class="var">b</span>, <span class="var">a</span>
+
+<span class="cm"># 4.</span>
+<span class="var">x</span> = <span class="num">10</span>; <span class="var">x</span> += <span class="num">3</span>  <span class="cm"># x = 13</span>
+<span class="var">x</span> *= <span class="num">2</span>            <span class="cm"># x = 26</span>
+
+<span class="cm"># 5.  3/2 → 1.5 (float),  3//2 → 1 (int)</span></div>
+      </div>
+
+      <div class="retenir green">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Opérateurs Python
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li><code>//</code> = division entière (quotient), <code>%</code> = modulo (reste), <code>**</code> = puissance.</li>
+            <li>En Python 3, <code>/</code> retourne toujours un <strong>float</strong>, même entre deux entiers.</li>
+            <li>La permutation <code>a, b = b, a</code> utilise l'<strong>unpacking de tuple</strong> : c'est idiomatic Python.</li>
+            <li>Les opérateurs d'affectation augmentée (<code>+=</code>, <code>*=</code>, …) modifient la variable <em>sur place</em>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 2 -->
+  <div class="exercise" id="ex2">
+    <div class="ex-header">
+      <div class="ex-num">02</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Entrées &amp; Sorties standards</div>
+        <div class="ex-tags">
+          <span class="badge green">✦ Débutant</span>
+          <span class="badge" style="color:var(--muted)">§ 7.3</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Écrire un programme Python qui :</p>
+      <ol>
+        <li>Demande à l'utilisateur son prénom et son âge.</li>
+        <li>Calcule l'année de naissance (supposer que nous sommes en 2025).</li>
+        <li>Affiche : <em>«Bonjour [Prénom], vous êtes né(e) en [année].»</em> via un f-string.</li>
+        <li>Affiche l'âge sur 3 chiffres alignés à droite, et l'année sur 4 chiffres, en utilisant le formatage de <code>print()</code>.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="var">prenom</span> = <span class="fn">input</span>(<span class="str">"Votre prénom : "</span>)
+<span class="var">age</span>    = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Votre âge : "</span>))
+<span class="var">annee</span>  = <span class="num">2025</span> - <span class="var">age</span>
+
+<span class="fn">print</span>(<span class="str">f"Bonjour <span class="var">{prenom}</span>, vous êtes né(e) en <span class="var">{annee}</span>."</span>)
+<span class="fn">print</span>(<span class="str">f"Âge  : <span class="var">{age:>3}</span>"</span>)
+<span class="fn">print</span>(<span class="str">f"Année: <span class="var">{annee:04d}</span>"</span>)</div>
+      </div>
+
+      <div class="retenir yellow">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — input / print / f-strings
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li><code>input()</code> retourne <strong>toujours une chaîne</strong>. Utiliser <code>int()</code> ou <code>float()</code> pour convertir.</li>
+            <li>Les f-strings (<code>f"…{variable}…"</code>) permettent l'interpolation directe et le formatage : <code>{val:>3}</code>, <code>{val:.2f}</code>, etc.</li>
+            <li>Syntaxe de formatage : <code>{valeur:alignement_largeur_type}</code> — très attendue en évaluation.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 3 -->
+  <div class="exercise" id="ex3">
+    <div class="ex-header">
+      <div class="ex-num">03</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Variables, Types &amp; Conversions</div>
+        <div class="ex-tags">
+          <span class="badge green">✦ Débutant</span>
+          <span class="badge" style="color:var(--muted)">§ 7.4 · 7.5</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Pour chaque expression, donner le type et la valeur :</p>
+      <ol>
+        <li><code>type(3.0)</code>, <code>type(3)</code>, <code>type("3")</code>, <code>type(True)</code></li>
+        <li>Que vaut <code>True + True + False</code> ?</li>
+        <li>Que vaut <code>bool(0)</code> ? <code>bool("")</code> ? <code>bool([])</code> ? <code>bool(-1)</code> ?</li>
+        <li>Créer un nombre complexe <code>z = 3 + 4j</code>. Accéder à sa partie réelle et imaginaire. Calculer son module.</li>
+        <li>Qu'est-ce que <code>None</code> ? Dans quel cas une fonction retourne-t-elle <code>None</code> implicitement ?</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="cm"># 1.</span>
+<span class="fn">type</span>(<span class="num">3.0</span>)   <span class="cm"># float</span>
+<span class="fn">type</span>(<span class="num">3</span>)     <span class="cm"># int</span>
+<span class="fn">type</span>(<span class="str">"3"</span>)   <span class="cm"># str</span>
+<span class="fn">type</span>(<span class="kw">True</span>)  <span class="cm"># bool</span>
+
+<span class="cm"># 2. True vaut 1, False vaut 0 → résultat = 2</span>
+<span class="kw">True</span> + <span class="kw">True</span> + <span class="kw">False</span>  <span class="cm"># → 2</span>
+
+<span class="cm"># 3. Valeurs "falsy"</span>
+<span class="fn">bool</span>(<span class="num">0</span>)   <span class="cm"># False</span>
+<span class="fn">bool</span>(<span class="str">""</span>)  <span class="cm"># False</span>
+<span class="fn">bool</span>([])  <span class="cm"># False</span>
+<span class="fn">bool</span>(-<span class="num">1</span>)  <span class="cm"># True  (tout entier ≠ 0 est truthy)</span>
+
+<span class="cm"># 4. Nombres complexes</span>
+<span class="var">z</span> = <span class="num">3</span> + <span class="num">4</span>j
+<span class="var">z</span>.real   <span class="cm"># → 3.0</span>
+<span class="var">z</span>.imag   <span class="cm"># → 4.0</span>
+<span class="fn">abs</span>(<span class="var">z</span>)   <span class="cm"># → 5.0  (√(3²+4²))</span>
+
+<span class="cm"># 5. None est retourné quand aucun return n'est explicite</span>
+<span class="kw">def</span> <span class="fn">f</span>(): <span class="kw">pass</span>
+<span class="fn">print</span>(<span class="fn">f</span>())  <span class="cm"># → None</span></div>
+      </div>
+
+      <div class="retenir blue">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Types Python
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li><strong>Types immuables</strong> : <code>int</code>, <code>float</code>, <code>complex</code>, <code>bool</code>, <code>str</code>, <code>tuple</code>, <code>bytes</code>. Ils ne peuvent pas être modifiés après création.</li>
+            <li><code>bool</code> est une sous-classe de <code>int</code> : <code>True == 1</code>, <code>False == 0</code>.</li>
+            <li>Valeurs <strong>falsy</strong> : <code>0</code>, <code>0.0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, <code>None</code>. Tout le reste est <em>truthy</em>.</li>
+            <li>Une fonction sans <code>return</code> retourne implicitement <code>None</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== PARTIE 2 =========== -->
+  <div class="section-title">Partie 2 — Structures de données</div>
+
+  <!-- EX 4 -->
+  <div class="exercise" id="ex4">
+    <div class="ex-header">
+      <div class="ex-num">04</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Chaînes de caractères — Manipulation avancée</div>
+        <div class="ex-tags">
+          <span class="badge yellow">◆ Intermédiaire</span>
+          <span class="badge" style="color:var(--muted)">§ 7.5.6</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Soit <code>s = "Bonjour le Monde!"</code>. Écrire les instructions Python pour :</p>
+      <ol>
+        <li>Afficher la longueur de <code>s</code>.</li>
+        <li>Extraire <code>"Monde"</code> par slicing.</li>
+        <li>Mettre toute la chaîne en majuscules, puis en minuscules.</li>
+        <li>Remplacer <code>"Monde"</code> par <code>"Python"</code>.</li>
+        <li>Vérifier si la chaîne commence par <code>"Bon"</code>.</li>
+        <li>Séparer la chaîne en une liste de mots.</li>
+        <li>Inverser la chaîne avec du slicing.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="var">s</span> = <span class="str">"Bonjour le Monde!"</span>
+
+<span class="fn">len</span>(<span class="var">s</span>)                   <span class="cm"># → 18</span>
+<span class="var">s</span>[<span class="num">11</span>:<span class="num">16</span>]                <span class="cm"># → "Monde"</span>
+<span class="var">s</span>.<span class="fn">upper</span>()               <span class="cm"># → "BONJOUR LE MONDE!"</span>
+<span class="var">s</span>.<span class="fn">lower</span>()               <span class="cm"># → "bonjour le monde!"</span>
+<span class="var">s</span>.<span class="fn">replace</span>(<span class="str">"Monde"</span>, <span class="str">"Python"</span>)  <span class="cm"># → "Bonjour le Python!"</span>
+<span class="var">s</span>.<span class="fn">startswith</span>(<span class="str">"Bon"</span>)    <span class="cm"># → True</span>
+<span class="var">s</span>.<span class="fn">split</span>()               <span class="cm"># → ['Bonjour', 'le', 'Monde!']</span>
+<span class="var">s</span>[::-<span class="num">1</span>]                 <span class="cm"># → "!ednoM el ruojnoB"</span></div>
+      </div>
+
+      <div class="retenir green">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Chaînes &amp; Slicing
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li>Slicing : <code>s[début:fin:pas]</code> — le dernier index est <strong>exclu</strong>.</li>
+            <li><code>s[::-1]</code> est le raccourci classique pour <strong>inverser</strong> une séquence.</li>
+            <li>Les chaînes sont <strong>immuables</strong> : les méthodes retournent une <em>nouvelle</em> chaîne.</li>
+            <li>Méthodes incontournables : <code>len()</code>, <code>upper()</code>, <code>lower()</code>, <code>replace()</code>, <code>split()</code>, <code>strip()</code>, <code>startswith()</code>, <code>find()</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 5 -->
+  <div class="exercise" id="ex5">
+    <div class="ex-header">
+      <div class="ex-num">05</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Listes &amp; Tuples</div>
+        <div class="ex-tags">
+          <span class="badge yellow">◆ Intermédiaire</span>
+          <span class="badge" style="color:var(--muted)">§ 7.5.6 · 7.6.1</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Soit <code>notes = [14, 8, 17, 12, 9, 15]</code>. Réaliser les opérations suivantes :</p>
+      <ol>
+        <li>Ajouter la note <code>11</code> en fin de liste.</li>
+        <li>Insérer la note <code>10</code> en position 2.</li>
+        <li>Supprimer la note <code>8</code> par sa valeur.</li>
+        <li>Trier la liste dans l'ordre croissant, puis décroissant.</li>
+        <li>Calculer la moyenne sans importer de module.</li>
+        <li>Créer un tuple <code>t</code> à partir de la liste. Pourquoi utiliser un tuple plutôt qu'une liste ?</li>
+        <li>Accéder au dernier élément avec un index négatif.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="var">notes</span> = [<span class="num">14</span>, <span class="num">8</span>, <span class="num">17</span>, <span class="num">12</span>, <span class="num">9</span>, <span class="num">15</span>]
+
+<span class="var">notes</span>.<span class="fn">append</span>(<span class="num">11</span>)          <span class="cm"># [14,8,17,12,9,15,11]</span>
+<span class="var">notes</span>.<span class="fn">insert</span>(<span class="num">2</span>, <span class="num">10</span>)       <span class="cm"># [14,8,10,17,12,9,15,11]</span>
+<span class="var">notes</span>.<span class="fn">remove</span>(<span class="num">8</span>)           <span class="cm"># supprime le premier 8</span>
+<span class="var">notes</span>.<span class="fn">sort</span>()               <span class="cm"># ordre croissant</span>
+<span class="var">notes</span>.<span class="fn">sort</span>(reverse=<span class="kw">True</span>)  <span class="cm"># ordre décroissant</span>
+
+<span class="var">moyenne</span> = <span class="fn">sum</span>(<span class="var">notes</span>) / <span class="fn">len</span>(<span class="var">notes</span>)
+
+<span class="var">t</span> = <span class="fn">tuple</span>(<span class="var">notes</span>)           <span class="cm"># tuple immuable</span>
+<span class="var">notes</span>[-<span class="num">1</span>]                  <span class="cm"># dernier élément</span></div>
+      </div>
+
+      <div class="retenir yellow">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Listes vs Tuples
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li>Les listes sont <strong>mutables</strong> (modifiables). Les tuples sont <strong>immuables</strong> (plus rapides, protègent les données).</li>
+            <li>Méthodes clés de liste : <code>append()</code>, <code>insert()</code>, <code>remove()</code>, <code>pop()</code>, <code>sort()</code>, <code>reverse()</code>, <code>index()</code>, <code>count()</code>.</li>
+            <li>Index négatifs : <code>-1</code> = dernier, <code>-2</code> = avant-dernier, etc.</li>
+            <li><code>sum()</code> et <code>len()</code> fonctionnent sur les deux.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 6 -->
+  <div class="exercise" id="ex6">
+    <div class="ex-header">
+      <div class="ex-num">06</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Dictionnaires</div>
+        <div class="ex-tags">
+          <span class="badge yellow">◆ Intermédiaire</span>
+          <span class="badge" style="color:var(--muted)">§ 7.6.2 · 7.6.3</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Créer un dictionnaire <code>etudiant</code> contenant : nom, prénom, âge, notes (liste). Puis :</p>
+      <ol>
+        <li>Accéder au nom via la clé.</li>
+        <li>Ajouter une clé <code>"filiere"</code>.</li>
+        <li>Modifier l'âge.</li>
+        <li>Supprimer la clé <code>"age"</code>.</li>
+        <li>Itérer sur les clés, puis sur les paires clé-valeur.</li>
+        <li>Vérifier si la clé <code>"notes"</code> existe.</li>
+        <li>Utiliser <code>get()</code> pour accéder à une clé inexistante sans erreur.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="var">etudiant</span> = {
+    <span class="str">"nom"</span>    : <span class="str">"Dupont"</span>,
+    <span class="str">"prenom"</span> : <span class="str">"Alice"</span>,
+    <span class="str">"age"</span>    : <span class="num">20</span>,
+    <span class="str">"notes"</span>  : [<span class="num">14</span>, <span class="num">16</span>, <span class="num">12</span>]
+}
+
+<span class="var">etudiant</span>[<span class="str">"nom"</span>]            <span class="cm"># → "Dupont"</span>
+<span class="var">etudiant</span>[<span class="str">"filiere"</span>] = <span class="str">"Info"</span>
+<span class="var">etudiant</span>[<span class="str">"age"</span>] = <span class="num">21</span>
+<span class="kw">del</span> <span class="var">etudiant</span>[<span class="str">"age"</span>]
+
+<span class="kw">for</span> <span class="var">cle</span> <span class="kw">in</span> <span class="var">etudiant</span>.keys():
+    <span class="fn">print</span>(<span class="var">cle</span>)
+
+<span class="kw">for</span> <span class="var">cle</span>, <span class="var">val</span> <span class="kw">in</span> <span class="var">etudiant</span>.items():
+    <span class="fn">print</span>(<span class="var">cle</span>, <span class="str">"→"</span>, <span class="var">val</span>)
+
+<span class="str">"notes"</span> <span class="kw">in</span> <span class="var">etudiant</span>        <span class="cm"># → True</span>
+<span class="var">etudiant</span>.<span class="fn">get</span>(<span class="str">"mention"</span>, <span class="str">"N/A"</span>)  <span class="cm"># → "N/A"</span></div>
+      </div>
+
+      <div class="retenir blue">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Dictionnaires
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li>Un dictionnaire est une collection de paires <strong>clé : valeur</strong>. Les clés sont uniques.</li>
+            <li>Méthodes clés : <code>.keys()</code>, <code>.values()</code>, <code>.items()</code>, <code>.get(clé, défaut)</code>, <code>.update()</code>, <code>.pop()</code>.</li>
+            <li>Préférer <code>.get()</code> à <code>d[clé]</code> pour éviter un <code>KeyError</code> si la clé n'existe pas.</li>
+            <li>Les valeurs peuvent être de <em>n'importe quel type</em>, y compris des listes ou d'autres dictionnaires.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== PARTIE 3 =========== -->
+  <div class="section-title">Partie 3 — Structures de contrôle</div>
+
+  <!-- EX 7 -->
+  <div class="exercise" id="ex7">
+    <div class="ex-header">
+      <div class="ex-num">07</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Structures Conditionnelles</div>
+        <div class="ex-tags">
+          <span class="badge yellow">◆ Intermédiaire</span>
+          <span class="badge" style="color:var(--muted)">§ 7.7</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Écrire les programmes suivants :</p>
+      <ol>
+        <li>Un programme qui demande une note (0-20) et affiche : <em>Excellent</em> (≥16), <em>Bien</em> (≥14), <em>Assez Bien</em> (≥12), <em>Passable</em> (≥10), <em>Insuffisant</em> (&lt;10).</li>
+        <li>Vérifier si une année saisie est bissextile (divisible par 4, sauf si divisible par 100, sauf si divisible par 400).</li>
+        <li>Déterminer le signe d'un nombre : positif, négatif ou nul. Écrire cela avec une <strong>expression ternaire</strong>.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="cm"># 1. Mention</span>
+<span class="var">note</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Note : "</span>))
+<span class="kw">if</span>   <span class="var">note</span> >= <span class="num">16</span>: <span class="fn">print</span>(<span class="str">"Excellent"</span>)
+<span class="kw">elif</span> <span class="var">note</span> >= <span class="num">14</span>: <span class="fn">print</span>(<span class="str">"Bien"</span>)
+<span class="kw">elif</span> <span class="var">note</span> >= <span class="num">12</span>: <span class="fn">print</span>(<span class="str">"Assez Bien"</span>)
+<span class="kw">elif</span> <span class="var">note</span> >= <span class="num">10</span>: <span class="fn">print</span>(<span class="str">"Passable"</span>)
+<span class="kw">else</span>:            <span class="fn">print</span>(<span class="str">"Insuffisant"</span>)
+
+<span class="cm"># 2. Année bissextile</span>
+<span class="var">a</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Année : "</span>))
+<span class="var">bis</span> = (<span class="var">a</span> % <span class="num">4</span> == <span class="num">0</span> <span class="kw">and</span> <span class="var">a</span> % <span class="num">100</span> != <span class="num">0</span>) <span class="kw">or</span> (<span class="var">a</span> % <span class="num">400</span> == <span class="num">0</span>)
+<span class="fn">print</span>(<span class="str">"Bissextile"</span> <span class="kw">if</span> <span class="var">bis</span> <span class="kw">else</span> <span class="str">"Non bissextile"</span>)
+
+<span class="cm"># 3. Expression ternaire</span>
+<span class="var">n</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Nombre : "</span>))
+<span class="var">signe</span> = <span class="str">"positif"</span> <span class="kw">if</span> <span class="var">n</span> > <span class="num">0</span> <span class="kw">else</span> (<span class="str">"négatif"</span> <span class="kw">if</span> <span class="var">n</span> < <span class="num">0</span> <span class="kw">else</span> <span class="str">"nul"</span>)</span>
+<span class="fn">print</span>(<span class="var">signe</span>)</div>
+      </div>
+
+      <div class="retenir green">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Conditions
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li>Structure : <code>if … elif … else</code> (pas de <code>switch</code> en Python &lt; 3.10).</li>
+            <li>Expression ternaire : <code>val_si_vrai if condition else val_si_faux</code>.</li>
+            <li>Opérateurs logiques : <code>and</code>, <code>or</code>, <code>not</code> (pas <code>&&</code> ni <code>||</code>).</li>
+            <li>L'indentation <strong>définit les blocs</strong> en Python — erreur d'indentation = SyntaxError.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 8 -->
+  <div class="exercise" id="ex8">
+    <div class="ex-header">
+      <div class="ex-num">08</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Structures de Boucle</div>
+        <div class="ex-tags">
+          <span class="badge yellow">◆ Intermédiaire</span>
+          <span class="badge" style="color:var(--muted)">§ 7.8</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Résoudre les problèmes suivants, d'abord avec <code>while</code> puis avec <code>for</code> quand c'est possible :</p>
+      <ol>
+        <li>Afficher les nombres pairs entre 1 et 20.</li>
+        <li>Calculer la factorielle de <em>n</em> (saisie utilisateur).</li>
+        <li>Afficher la table de multiplication de 7.</li>
+        <li>Parcourir une liste de prénoms et afficher ceux qui commencent par 'A'.</li>
+        <li>Trouver le plus grand élément d'une liste <em>sans</em> utiliser <code>max()</code>.</li>
+        <li>Utiliser <code>enumerate()</code> pour afficher l'index et la valeur d'une liste.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="cm"># 1. Nombres pairs</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, <span class="num">21</span>, <span class="num">2</span>): <span class="fn">print</span>(<span class="var">i</span>)
+
+<span class="cm"># 2. Factorielle</span>
+<span class="var">n</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"n = "</span>))
+<span class="var">fact</span> = <span class="num">1</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="var">n</span>+<span class="num">1</span>): <span class="var">fact</span> *= <span class="var">i</span>
+
+<span class="cm"># 3. Table de 7</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>):
+    <span class="fn">print</span>(<span class="str">f"7 × <span class="var">{i}</span> = <span class="var">{7*i}</span>"</span>)
+
+<span class="cm"># 4. Prénoms commençant par 'A'</span>
+<span class="var">prenoms</span> = [<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Anna"</span>, <span class="str">"Clara"</span>]
+<span class="kw">for</span> <span class="var">p</span> <span class="kw">in</span> <span class="var">prenoms</span>:
+    <span class="kw">if</span> <span class="var">p</span>.<span class="fn">startswith</span>(<span class="str">"A"</span>): <span class="fn">print</span>(<span class="var">p</span>)
+
+<span class="cm"># 5. Maximum sans max()</span>
+<span class="var">lst</span> = [<span class="num">3</span>, <span class="num">7</span>, <span class="num">1</span>, <span class="num">9</span>, <span class="num">4</span>]
+<span class="var">maxi</span> = <span class="var">lst</span>[<span class="num">0</span>]
+<span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="var">lst</span>:
+    <span class="kw">if</span> <span class="var">x</span> > <span class="var">maxi</span>: <span class="var">maxi</span> = <span class="var">x</span>
+
+<span class="cm"># 6. enumerate()</span>
+<span class="kw">for</span> <span class="var">idx</span>, <span class="var">val</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">lst</span>):
+    <span class="fn">print</span>(<span class="str">f"[<span class="var">{idx}</span>] = <span class="var">{val}</span>"</span>)</div>
+      </div>
+
+      <div class="retenir yellow">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Boucles
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li><code>for x in séquence</code> = boucle <em>pour chaque élément</em>. Préférer <code>for</code> quand le nombre d'itérations est connu.</li>
+            <li><code>while condition</code> = tant que la condition est vraie. Attention aux boucles infinies !</li>
+            <li><code>range(début, fin, pas)</code> — <code>fin</code> est exclu.</li>
+            <li><code>break</code> sort de la boucle, <code>continue</code> passe à l'itération suivante.</li>
+            <li><code>enumerate()</code> retourne <code>(index, valeur)</code> — très utile pour éviter d'écrire <code>range(len(...))</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== PARTIE 4 =========== -->
+  <div class="section-title">Partie 4 — Fonctions &amp; Compréhension</div>
+
+  <!-- EX 9 -->
+  <div class="exercise" id="ex9">
+    <div class="ex-header">
+      <div class="ex-num">09</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Fonctions &amp; Paramètres</div>
+        <div class="ex-tags">
+          <span class="badge red">▲ Avancé</span>
+          <span class="badge" style="color:var(--muted)">§ 7.9</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Écrire les fonctions suivantes :</p>
+      <ol>
+        <li>Une fonction <code>est_premier(n)</code> qui retourne <code>True</code> si <em>n</em> est premier.</li>
+        <li>Une fonction <code>statistiques(notes)</code> qui retourne (min, max, moyenne) sous forme de tuple.</li>
+        <li>Une fonction <code>factorielle(n)</code> <strong>récursive</strong>.</li>
+        <li>Une fonction avec un paramètre par défaut : <code>saluer(nom, politesse="Bonjour")</code>.</li>
+        <li>Illustrer la différence entre <strong>variable locale</strong> et <strong>variable globale</strong> avec un exemple.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="cm"># 1. Premier</span>
+<span class="kw">def</span> <span class="fn">est_premier</span>(<span class="var">n</span>):
+    <span class="kw">if</span> <span class="var">n</span> < <span class="num">2</span>: <span class="kw">return</span> <span class="kw">False</span>
+    <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, <span class="fn">int</span>(<span class="var">n</span>**<span class="num">0.5</span>)+<span class="num">1</span>):
+        <span class="kw">if</span> <span class="var">n</span> % <span class="var">i</span> == <span class="num">0</span>: <span class="kw">return</span> <span class="kw">False</span>
+    <span class="kw">return</span> <span class="kw">True</span>
+
+<span class="cm"># 2. Statistiques</span>
+<span class="kw">def</span> <span class="fn">statistiques</span>(<span class="var">notes</span>):
+    <span class="kw">return</span> <span class="fn">min</span>(<span class="var">notes</span>), <span class="fn">max</span>(<span class="var">notes</span>), <span class="fn">sum</span>(<span class="var">notes</span>)/<span class="fn">len</span>(<span class="var">notes</span>)
+
+<span class="cm"># 3. Récursion</span>
+<span class="kw">def</span> <span class="fn">factorielle</span>(<span class="var">n</span>):
+    <span class="kw">if</span> <span class="var">n</span> <= <span class="num">1</span>: <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">return</span> <span class="var">n</span> * <span class="fn">factorielle</span>(<span class="var">n</span> - <span class="num">1</span>)
+
+<span class="cm"># 4. Paramètre par défaut</span>
+<span class="kw">def</span> <span class="fn">saluer</span>(<span class="var">nom</span>, <span class="var">politesse</span>=<span class="str">"Bonjour"</span>):
+    <span class="fn">print</span>(<span class="str">f"<span class="var">{politesse}</span>, <span class="var">{nom}</span> !"</span>)
+<span class="fn">saluer</span>(<span class="str">"Alice"</span>)               <span class="cm"># Bonjour, Alice !</span>
+<span class="fn">saluer</span>(<span class="str">"Bob"</span>, <span class="str">"Bonsoir"</span>)      <span class="cm"># Bonsoir, Bob !</span>
+
+<span class="cm"># 5. Variable locale vs globale</span>
+<span class="var">compteur</span> = <span class="num">0</span>  <span class="cm"># globale</span>
+<span class="kw">def</span> <span class="fn">incrementer</span>():
+    <span class="kw">global</span> <span class="var">compteur</span>
+    <span class="var">compteur</span> += <span class="num">1</span>
+<span class="fn">incrementer</span>(); <span class="fn">print</span>(<span class="var">compteur</span>)  <span class="cm"># → 1</span></div>
+      </div>
+
+      <div class="retenir red">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Fonctions
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li>Définition : <code>def nom(params): … return valeur</code>.</li>
+            <li>Une fonction peut retourner <strong>plusieurs valeurs</strong> sous forme de tuple : <code>return a, b, c</code>.</li>
+            <li>Les paramètres avec valeur par défaut doivent être en <strong>fin de liste</strong> de paramètres.</li>
+            <li>Variable <strong>locale</strong> : ne vit que dans la fonction. Variable <strong>globale</strong> : déclarée hors fonction. Utiliser <code>global</code> pour la modifier dans une fonction.</li>
+            <li>La <strong>récursion</strong> nécessite impérativement un <em>cas de base</em> pour éviter la récursion infinie.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 10 -->
+  <div class="exercise" id="ex10">
+    <div class="ex-header">
+      <div class="ex-num">10</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Compréhension de listes</div>
+        <div class="ex-tags">
+          <span class="badge red">▲ Avancé</span>
+          <span class="badge" style="color:var(--muted)">§ 7.10</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Réécrire chaque boucle sous forme de compréhension de liste :</p>
+      <ol>
+        <li>Créer la liste des carrés de 1 à 10.</li>
+        <li>Filtrer les nombres impairs d'une liste.</li>
+        <li>Créer une liste de tuples <code>(i, i²)</code> pour <em>i</em> de 1 à 5.</li>
+        <li>Mettre tous les mots d'une phrase en majuscules.</li>
+        <li>Créer un dictionnaire <code>{n: n**2}</code> pour n de 1 à 5 (compréhension de dictionnaire).</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="cm"># 1. Carrés</span>
+<span class="var">carres</span> = [<span class="var">x</span>**<span class="num">2</span> <span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>)]
+
+<span class="cm"># 2. Nombres impairs (filtre avec if)</span>
+<span class="var">lst</span> = [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>]
+<span class="var">impairs</span> = [<span class="var">x</span> <span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="var">lst</span> <span class="kw">if</span> <span class="var">x</span> % <span class="num">2</span> != <span class="num">0</span>]
+
+<span class="cm"># 3. Tuples (i, i²)</span>
+<span class="var">pairs</span> = [(<span class="var">i</span>, <span class="var">i</span>**<span class="num">2</span>) <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>)]
+
+<span class="cm"># 4. Mots en majuscules</span>
+<span class="var">phrase</span> = <span class="str">"bonjour le monde"</span>
+<span class="var">mots</span> = [<span class="var">m</span>.<span class="fn">upper</span>() <span class="kw">for</span> <span class="var">m</span> <span class="kw">in</span> <span class="var">phrase</span>.<span class="fn">split</span>()]
+
+<span class="cm"># 5. Compréhension de dictionnaire</span>
+<span class="var">d</span> = {<span class="var">n</span>: <span class="var">n</span>**<span class="num">2</span> <span class="kw">for</span> <span class="var">n</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>)}
+<span class="cm"># → {1:1, 2:4, 3:9, 4:16, 5:25}</span></div>
+      </div>
+
+      <div class="retenir green">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Compréhension de liste
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li>Syntaxe : <code>[expression for var in itérable if condition]</code>.</li>
+            <li>Plus concis et souvent plus rapide qu'une boucle for classique.</li>
+            <li>Compréhension de dict : <code>{clé: valeur for var in itérable}</code>.</li>
+            <li>Compréhension de set : <code>{expression for var in itérable}</code>.</li>
+            <li>Ne pas abuser : si trop complexe, une boucle normale est plus lisible.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== PARTIE 5 =========== -->
+  <div class="section-title">Partie 5 — NumPy &amp; Calcul Scientifique</div>
+
+  <!-- EX 11 -->
+  <div class="exercise" id="ex11">
+    <div class="ex-header">
+      <div class="ex-num">11</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">NumPy — Tableaux &amp; Opérations</div>
+        <div class="ex-tags">
+          <span class="badge blue">⊕ NumPy</span>
+          <span class="badge" style="color:var(--muted)">§ 8.2</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Importer NumPy et réaliser les opérations suivantes :</p>
+      <ol>
+        <li>Créer un tableau de 10 zéros, puis un tableau de 5 valeurs toutes égales à 7.</li>
+        <li>Créer un tableau des entiers de 0 à 20 avec <code>arange()</code>, puis un tableau de 5 valeurs régulièrement espacées entre 0 et 1 avec <code>linspace()</code>.</li>
+        <li>Créer le tableau <code>a = np.array([1, 4, 9, 16, 25])</code>. Appliquer la racine carrée à tous les éléments <em>sans boucle</em>.</li>
+        <li>Créer une matrice identité 3×3. Créer une matrice aléatoire 2×3.</li>
+        <li>Effectuer la multiplication matricielle de deux matrices compatibles.</li>
+        <li>Calculer la moyenne, le maximum et l'écart-type d'un tableau.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir les réponses</button>
+      <div class="answer">
+        <div class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1.</span>
+np.<span class="fn">zeros</span>(<span class="num">10</span>)
+np.<span class="fn">full</span>(<span class="num">5</span>, <span class="num">7</span>)
+
+<span class="cm"># 2.</span>
+np.<span class="fn">arange</span>(<span class="num">0</span>, <span class="num">21</span>)                  <span class="cm"># [0, 1, ..., 20]</span>
+np.<span class="fn">linspace</span>(<span class="num">0</span>, <span class="num">1</span>, <span class="num">5</span>)             <span class="cm"># [0., 0.25, 0.5, 0.75, 1.]</span>
+
+<span class="cm"># 3. Vectorisation</span>
+<span class="var">a</span> = np.<span class="fn">array</span>([<span class="num">1</span>, <span class="num">4</span>, <span class="num">9</span>, <span class="num">16</span>, <span class="num">25</span>])
+np.<span class="fn">sqrt</span>(<span class="var">a</span>)                        <span class="cm"># → [1., 2., 3., 4., 5.]</span>
+
+<span class="cm"># 4. Matrices</span>
+np.<span class="fn">eye</span>(<span class="num">3</span>)                          <span class="cm"># identité 3×3</span>
+np.random.<span class="fn">rand</span>(<span class="num">2</span>, <span class="num">3</span>)             <span class="cm"># aléatoire 2×3</span>
+
+<span class="cm"># 5. Multiplication matricielle</span>
+<span class="var">A</span> = np.<span class="fn">array</span>([[<span class="num">1</span>,<span class="num">2</span>],[<span class="num">3</span>,<span class="num">4</span>]])
+<span class="var">B</span> = np.<span class="fn">array</span>([[<span class="num">5</span>,<span class="num">6</span>],[<span class="num">7</span>,<span class="num">8</span>]])
+np.<span class="fn">dot</span>(<span class="var">A</span>, <span class="var">B</span>)   <span class="cm"># ou A @ B</span>
+
+<span class="cm"># 6. Statistiques</span>
+<span class="var">t</span> = np.<span class="fn">array</span>([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>])
+<span class="var">t</span>.<span class="fn">mean</span>(), <span class="var">t</span>.<span class="fn">max</span>(), <span class="var">t</span>.<span class="fn">std</span>()</div>
+      </div>
+
+      <div class="retenir blue">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — NumPy
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li>NumPy opère sur des tableaux <em>entiers</em> sans boucle : c'est la <strong>vectorisation</strong> — beaucoup plus rapide.</li>
+            <li><code>arange(debut, fin, pas)</code> génère des entiers ; <code>linspace(début, fin, nb)</code> génère des flottants régulièrement espacés.</li>
+            <li>Fonctions universelles (ufuncs) : <code>np.sqrt</code>, <code>np.sin</code>, <code>np.exp</code>, <code>np.log</code> — s'appliquent élément par élément.</li>
+            <li>Multiplication matricielle : <code>np.dot(A, B)</code> ou l'opérateur <code>@</code>. Ne pas confondre avec <code>A * B</code> (multiplication élément par élément).</li>
+            <li>Attributs utiles : <code>.shape</code>, <code>.dtype</code>, <code>.ndim</code>, <code>.size</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 12 — Synthèse -->
+  <div class="exercise" id="ex12">
+    <div class="ex-header">
+      <div class="ex-num">12</div>
+      <div class="ex-title-wrap">
+        <div class="ex-title">Exercice de Synthèse — Gestion de notes</div>
+        <div class="ex-tags">
+          <span class="badge red">▲ Avancé</span>
+          <span class="badge blue">⊕ NumPy</span>
+          <span class="badge" style="color:var(--muted)">Tous chapitres</span>
+        </div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <p>Écrire un programme complet de gestion de notes d'une classe. Le programme doit :</p>
+      <ol>
+        <li>Stocker les données dans un <strong>dictionnaire</strong> : <code>{"Alice": [14,16,12], "Bob": [9,11,8], "Clara": [18,17,19]}</code>.</li>
+        <li>Définir une fonction <code>moyenne(notes)</code> utilisant NumPy.</li>
+        <li>Afficher pour chaque étudiant : son nom, sa moyenne (arrondie à 1 décimale) et sa mention.</li>
+        <li>Trouver et afficher l'étudiant avec la meilleure moyenne.</li>
+        <li>Utiliser une <strong>compréhension de liste</strong> pour obtenir la liste des étudiants ayant une moyenne ≥ 12.</li>
+        <li>Calculer la moyenne générale de la classe avec NumPy.</li>
+      </ol>
+
+      <button class="answer-toggle" onclick="toggleAnswer(this)">▶ Voir le corrigé complet</button>
+      <div class="answer">
+        <div class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">classe</span> = {
+    <span class="str">"Alice"</span>: [<span class="num">14</span>, <span class="num">16</span>, <span class="num">12</span>],
+    <span class="str">"Bob"</span>:   [<span class="num">9</span>,  <span class="num">11</span>, <span class="num">8</span> ],
+    <span class="str">"Clara"</span>: [<span class="num">18</span>, <span class="num">17</span>, <span class="num">19</span>]
+}
+
+<span class="kw">def</span> <span class="fn">moyenne</span>(<span class="var">notes</span>):
+    <span class="kw">return</span> np.<span class="fn">mean</span>(notes)
+
+<span class="kw">def</span> <span class="fn">mention</span>(<span class="var">m</span>):
+    <span class="kw">if</span>   <span class="var">m</span> >= <span class="num">16</span>: <span class="kw">return</span> <span class="str">"Très Bien"</span>
+    <span class="kw">elif</span> <span class="var">m</span> >= <span class="num">14</span>: <span class="kw">return</span> <span class="str">"Bien"</span>
+    <span class="kw">elif</span> <span class="var">m</span> >= <span class="num">12</span>: <span class="kw">return</span> <span class="str">"Assez Bien"</span>
+    <span class="kw">elif</span> <span class="var">m</span> >= <span class="num">10</span>: <span class="kw">return</span> <span class="str">"Passable"</span>
+    <span class="kw">else</span>:         <span class="kw">return</span> <span class="str">"Insuffisant"</span>
+
+<span class="cm"># Affichage + recherche du meilleur</span>
+<span class="var">meilleures</span> = {}
+<span class="kw">for</span> <span class="var">nom</span>, <span class="var">notes</span> <span class="kw">in</span> <span class="var">classe</span>.items():
+    <span class="var">m</span> = <span class="fn">moyenne</span>(notes)
+    <span class="var">meilleures</span>[<span class="var">nom</span>] = <span class="var">m</span>
+    <span class="fn">print</span>(<span class="str">f"<span class="var">{nom}</span> : <span class="var">{m:.1f}</span> — <span class="var">{mention(m)}</span>"</span>)
+
+<span class="cm"># Meilleur étudiant</span>
+<span class="var">best</span> = <span class="fn">max</span>(<span class="var">meilleures</span>, key=<span class="kw">lambda</span> <span class="var">k</span>: <span class="var">meilleures</span>[<span class="var">k</span>])
+<span class="fn">print</span>(<span class="str">f"\nMeilleur : <span class="var">{best}</span> avec <span class="var">{meilleures[best]:.1f}</span>"</span>)
+
+<span class="cm"># Admis (≥12) par compréhension</span>
+<span class="var">admis</span> = [<span class="var">n</span> <span class="kw">for</span> <span class="var">n</span>, <span class="var">m</span> <span class="kw">in</span> <span class="var">meilleures</span>.items() <span class="kw">if</span> <span class="var">m</span> >= <span class="num">12</span>]
+<span class="fn">print</span>(<span class="str">"Admis :"</span>, <span class="var">admis</span>)
+
+<span class="cm"># Moyenne générale</span>
+<span class="var">toutes</span> = np.<span class="fn">concatenate</span>(<span class="fn">list</span>(<span class="var">classe</span>.values()))
+<span class="fn">print</span>(<span class="str">f"Moyenne classe : <span class="var">{np.mean(toutes):.2f}</span>"</span>)</div>
+      </div>
+
+      <div class="retenir red">
+        <div class="retenir-header" onclick="toggleRetenir(this)">
+          💡 À retenir — Synthèse &amp; Bonnes pratiques
+          <span class="toggle-icon">▾</span>
+        </div>
+        <div class="retenir-body">
+          <ul>
+            <li>Décomposer un problème complexe en <strong>fonctions courtes</strong> et réutilisables.</li>
+            <li><code>max(dict, key=lambda k: dict[k])</code> = trouver la clé ayant la valeur maximale.</li>
+            <li><code>np.concatenate()</code> fusionne plusieurs tableaux en un seul.</li>
+            <li>Combiner dictionnaire + boucle + compréhension + NumPy = script Python professionnel.</li>
+            <li>Toujours tester ses fonctions avec des cas simples avant de les intégrer.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>TD Python — Chapitres 7 &amp; 8 &nbsp;·&nbsp; 12 exercices progressifs &nbsp;·&nbsp; Bonne révision ! 🐍</p>
+  </footer>
+
+</div>
+
+<script>
+function toggleAnswer(btn) {
+  const answer = btn.nextElementSibling;
+  answer.classList.toggle('visible');
+  btn.textContent = answer.classList.contains('visible')
+    ? '▼ Masquer les réponses'
+    : '▶ Voir les réponses';
+}
+
+function toggleRetenir(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.toggle-icon');
+  body.classList.toggle('visible');
+  icon.classList.toggle('rotated');
+}
+</script>
+</body>
+</html>

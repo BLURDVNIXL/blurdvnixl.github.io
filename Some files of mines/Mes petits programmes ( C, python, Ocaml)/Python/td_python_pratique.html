@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TD Python — Situations Pratiques</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=DM+Sans:ital,wght@0,300;0,500;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --paper: #fdfaf4;
+    --ink: #1a1612;
+    --muted: #7a7060;
+    --border: #d8d0c0;
+    --accent: #c0392b;
+    --accent2: #2980b9;
+    --accent3: #27ae60;
+    --accent4: #8e44ad;
+    --accent5: #e67e22;
+    --tag-bg: #eee8d8;
+    --code-bg: #1a1612;
+    --code-text: #f5f0e8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.75;
+  }
+
+  /* Texture papier */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 32px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    margin-bottom: 64px;
+  }
+
+  .header-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .header-desc {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 560px;
+    border-left: 3px solid var(--border);
+    padding-left: 16px;
+    margin-top: 20px;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ===== SCENARIO CARDS ===== */
+  .scenario {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 40px;
+    box-shadow: 4px 4px 0 var(--border);
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .scenario:hover {
+    box-shadow: 6px 6px 0 var(--border);
+    transform: translate(-1px, -1px);
+  }
+
+  .scenario-top {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0;
+  }
+
+  .scenario-stripe {
+    width: 6px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .scenario-stripe.blue   { background: var(--accent2); }
+  .scenario-stripe.green  { background: var(--accent3); }
+  .scenario-stripe.purple { background: var(--accent4); }
+  .scenario-stripe.orange { background: var(--accent5); }
+  .scenario-stripe.red    { background: var(--accent); }
+
+  .scenario-inner { padding: 28px 32px; }
+
+  .scenario-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .scenario-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .scenario-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 3px 9px;
+    border-radius: 2px;
+    background: var(--tag-bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .tag.diff-1 { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .tag.diff-2 { background: #fff8e1; color: #f57f17; border-color: #ffe082; }
+  .tag.diff-3 { background: #fce4ec; color: #c62828; border-color: #ef9a9a; }
+
+  h2.scenario-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .scenario-context {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .scenario-context strong { color: var(--ink); font-style: normal; }
+
+  .missions {
+    margin-bottom: 20px;
+  }
+
+  .missions-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .missions ol {
+    padding-left: 20px;
+  }
+
+  .missions li {
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    padding-left: 4px;
+  }
+
+  .missions li strong { color: var(--accent); }
+
+  /* Données de départ */
+  .starter {
+    margin-bottom: 20px;
+  }
+
+  .starter-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  /* Code blocks */
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.9;
+    padding: 20px 24px;
+    border-radius: 2px;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 0;
+  }
+
+  pre.code-block .kw  { color: #ff7b72; }
+  pre.code-block .fn  { color: #79c0ff; }
+  pre.code-block .str { color: #a5d6ff; }
+  pre.code-block .num { color: #ffa657; }
+  pre.code-block .cm  { color: #8b949e; font-style: italic; }
+  pre.code-block .var { color: #ffd700; }
+  pre.code-block .op  { color: #ff7b72; }
+  pre.code-block .ok  { color: #3fb950; }
+
+  /* Accordion answer */
+  .answer-section {
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+
+  .answer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 9px 16px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    transition: all 0.2s;
+    width: 100%;
+    text-align: left;
+  }
+
+  .answer-toggle:hover {
+    background: var(--tag-bg);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .answer-toggle .arr { margin-left: auto; transition: transform 0.3s; }
+  .answer-toggle.open .arr { transform: rotate(90deg); }
+
+  .answer-body {
+    display: none;
+    margin-top: 16px;
+  }
+  .answer-body.visible { display: block; }
+
+  .answer-note {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-left: 3px solid var(--border);
+  }
+
+  /* Retenir box */
+  .retenir {
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .retenir-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--ink);
+    transition: background 0.2s;
+  }
+
+  .retenir-btn:hover { background: var(--tag-bg); }
+  .retenir-btn .ri { margin-left: auto; transition: transform 0.3s; }
+  .retenir-btn.open .ri { transform: rotate(180deg); }
+
+  .retenir-content {
+    display: none;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    background: var(--tag-bg);
+  }
+
+  .retenir-content.visible { display: block; }
+  .retenir-content ul { padding-left: 18px; }
+  .retenir-content li { margin-bottom: 6px; }
+
+  .retenir.c-blue .retenir-btn { border-left: 4px solid var(--accent2); }
+  .retenir.c-green .retenir-btn { border-left: 4px solid var(--accent3); }
+  .retenir.c-red .retenir-btn { border-left: 4px solid var(--accent); }
+  .retenir.c-purple .retenir-btn { border-left: 4px solid var(--accent4); }
+  .retenir.c-orange .retenir-btn { border-left: 4px solid var(--accent5); }
+
+  code { 
+    font-family: 'IBM Plex Mono', monospace; 
+    font-size: 12px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 1px 6px;
+  }
+
+  /* Section dividers */
+  .chapter-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 56px 0 28px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .chapter-divider::before, .chapter-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .chapter-divider span {
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: var(--paper);
+    white-space: nowrap;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 2px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  footer p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 32px 16px 60px; }
+    .scenario-header { flex-direction: column; }
+    .header-stats { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-eyebrow">TD Python — Situations Pratiques</div>
+    <h1>Des programmes <em>qui<br>ont du sens</em></h1>
+    <p class="header-desc">10 situations du monde réel à résoudre en Python. Chaque exercice simule un problème concret : gestion, calcul, analyse, automatisation.</p>
+    <div class="header-stats">
+      <div class="stat"><span class="stat-num">10</span><span class="stat-label">Situations</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">Niveaux</span></div>
+      <div class="stat"><span class="stat-num">Ch.7+8</span><span class="stat-label">Chapitres</span></div>
+    </div>
+  </header>
+
+  <!-- ============ DOMAINE 1 : QUOTIDIEN ============ -->
+  <div class="chapter-divider"><span>🏠 Vie quotidienne</span></div>
+
+  <!-- SCÉNARIO 1 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe red"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 01</div>
+            <h2 class="scenario-title">💰 Calculateur de budget mensuel</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-1">✦ Facile</span>
+            <span class="tag">input / dict / boucle</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu viens de commencer à vivre seul(e) et tu veux créer un outil simple pour suivre tes dépenses mensuelles et savoir s'il te reste de l'argent à la fin du mois.
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Demander le salaire mensuel net de l'utilisateur.</li>
+            <li>Demander les dépenses par catégorie (loyer, courses, transport, loisirs, autres) via <code>input()</code>.</li>
+            <li>Stocker chaque dépense dans un <strong>dictionnaire</strong>.</li>
+            <li>Calculer et afficher le total des dépenses et le solde restant.</li>
+            <li>Afficher un <strong>avertissement</strong> si le solde est négatif, un <strong>message d'encouragement</strong> sinon.</li>
+            <li><strong>Bonus :</strong> Afficher le pourcentage de chaque poste par rapport au salaire.</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">def</span> <span class="fn">budget_mensuel</span>():
+    <span class="fn">print</span>(<span class="str">"=== Calculateur de Budget Mensuel ==="</span>)
+
+    <span class="var">salaire</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Salaire mensuel net (€) : "</span>))
+
+    <span class="var">categories</span> = [<span class="str">"Loyer"</span>, <span class="str">"Courses"</span>, <span class="str">"Transport"</span>, <span class="str">"Loisirs"</span>, <span class="str">"Autres"</span>]
+    <span class="var">depenses</span> = {}
+
+    <span class="kw">for</span> <span class="var">cat</span> <span class="kw">in</span> <span class="var">categories</span>:
+        <span class="var">montant</span> = <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">f"<span class="var">{cat}</span> (€) : "</span>))
+        <span class="var">depenses</span>[<span class="var">cat</span>] = <span class="var">montant</span>
+
+    <span class="var">total</span>  = <span class="fn">sum</span>(<span class="var">depenses</span>.values())
+    <span class="var">solde</span>  = <span class="var">salaire</span> - <span class="var">total</span>
+
+    <span class="fn">print</span>(<span class="str">"\n--- Récapitulatif ---"</span>)
+    <span class="kw">for</span> <span class="var">cat</span>, <span class="var">m</span> <span class="kw">in</span> <span class="var">depenses</span>.items():
+        <span class="var">pct</span> = (<span class="var">m</span> / <span class="var">salaire</span>) * <span class="num">100</span>
+        <span class="fn">print</span>(<span class="str">f"  {cat:<12} {m:>8.2f} €  ({pct:.1f}%)"</span>)
+
+    <span class="fn">print</span>(<span class="str">f"\nTotal dépenses : {total:.2f} €"</span>)
+    <span class="fn">print</span>(<span class="str">f"Solde restant  : {solde:.2f} €"</span>)
+
+    <span class="kw">if</span> <span class="var">solde</span> < <span class="num">0</span>:
+        <span class="fn">print</span>(<span class="str">"⚠️  Attention : tu dépenses plus que tu ne gagnes !"</span>)
+    <span class="kw">elif</span> <span class="var">solde</span> < <span class="var">salaire</span> * <span class="num">0.1</span>:
+        <span class="fn">print</span>(<span class="str">"💡 Il reste peu — pense à mettre de côté !"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">f"✅ Bien ! Tu économises {solde:.2f} € ce mois."</span>)
+
+<span class="fn">budget_mensuel</span>()</pre>
+            <div class="answer-note">Pense à tester avec un solde positif et un solde négatif pour valider les deux branches.</div>
+          </div>
+        </div>
+
+        <div class="retenir c-green">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li><code>input()</code> retourne une <strong>chaîne</strong> → toujours convertir avec <code>float()</code> ou <code>int()</code>.</li>
+              <li>Boucler sur une liste de catégories pour remplir un dictionnaire : pattern très courant.</li>
+              <li><code>sum(dict.values())</code> = somme de toutes les valeurs du dictionnaire.</li>
+              <li>Formatage aligné : <code>{valeur:>8.2f}</code> = aligné à droite sur 8 chars, 2 décimales.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCÉNARIO 2 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe blue"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 02</div>
+            <h2 class="scenario-title">🎲 Jeu du nombre mystère</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-1">✦ Facile</span>
+            <span class="tag">while / random / conditions</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu veux créer un mini-jeu pour t'amuser. L'ordinateur choisit un nombre secret entre 1 et 100, et le joueur doit le deviner avec des indices.
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Générer un nombre aléatoire entre 1 et 100 avec <code>random.randint()</code>.</li>
+            <li>Boucler jusqu'à ce que le joueur trouve le nombre.</li>
+            <li>À chaque tentative, indiquer si c'est <em>trop grand</em>, <em>trop petit</em>, ou <em>trouvé</em>.</li>
+            <li>Compter le nombre d'essais et afficher un message selon le score (≤5 : excellent, ≤10 : bien, &gt;10 : peut mieux faire).</li>
+            <li><strong>Bonus :</strong> Proposer de rejouer et afficher le record de la session.</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">import</span> random
+
+<span class="kw">def</span> <span class="fn">jouer</span>():
+    <span class="var">secret</span>  = random.<span class="fn">randint</span>(<span class="num">1</span>, <span class="num">100</span>)
+    <span class="var">essais</span>  = <span class="num">0</span>
+    <span class="var">trouve</span>  = <span class="kw">False</span>
+
+    <span class="fn">print</span>(<span class="str">"🎲 J'ai choisi un nombre entre 1 et 100. À toi !"</span>)
+
+    <span class="kw">while not</span> <span class="var">trouve</span>:
+        <span class="var">tentative</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Ton nombre : "</span>))
+        <span class="var">essais</span> += <span class="num">1</span>
+
+        <span class="kw">if</span>   <span class="var">tentative</span> < <span class="var">secret</span>: <span class="fn">print</span>(<span class="str">"📈 Trop petit !"</span>)
+        <span class="kw">elif</span> <span class="var">tentative</span> > <span class="var">secret</span>: <span class="fn">print</span>(<span class="str">"📉 Trop grand !"</span>)
+        <span class="kw">else</span>:
+            <span class="var">trouve</span> = <span class="kw">True</span>
+            <span class="fn">print</span>(<span class="str">f"🎉 Bravo ! Trouvé en {essais} essai(s) !"</span>)
+
+    <span class="kw">if</span>   <span class="var">essais</span> <= <span class="num">5</span>:  <span class="fn">print</span>(<span class="str">"⭐ Excellent !"</span>)
+    <span class="kw">elif</span> <span class="var">essais</span> <= <span class="num">10</span>: <span class="fn">print</span>(<span class="str">"👍 Bien joué !"</span>)
+    <span class="kw">else</span>:              <span class="fn">print</span>(<span class="str">"💪 Peut mieux faire..."</span>)
+
+    <span class="kw">return</span> <span class="var">essais</span>
+
+<span class="cm"># Bonus : session avec record</span>
+<span class="var">record</span> = <span class="fn">float</span>(<span class="str">"inf"</span>)
+<span class="kw">while True</span>:
+    <span class="var">score</span>  = <span class="fn">jouer</span>()
+    <span class="var">record</span> = <span class="fn">min</span>(<span class="var">record</span>, <span class="var">score</span>)
+    <span class="fn">print</span>(<span class="str">f"🏆 Record session : {record} essai(s)"</span>)
+    <span class="kw">if</span> <span class="fn">input</span>(<span class="str">"Rejouer ? (o/n) : "</span>).lower() != <span class="str">"o"</span>:
+        <span class="kw">break</span></pre>
+          </div>
+        </div>
+
+        <div class="retenir c-blue">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li><code>import random</code> — <code>random.randint(a, b)</code> inclut <strong>les deux bornes</strong>.</li>
+              <li>Le <strong>flag booléen</strong> (<code>trouve = False</code>) est un pattern classique pour contrôler une boucle <code>while</code>.</li>
+              <li><code>float("inf")</code> = l'infini positif, pratique pour initialiser un minimum.</li>
+              <li><code>str.lower()</code> permet de rendre la saisie insensible à la casse.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DOMAINE 2 : SCOLAIRE / ACADÉMIQUE ============ -->
+  <div class="chapter-divider"><span>🎓 Domaine scolaire</span></div>
+
+  <!-- SCÉNARIO 3 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe green"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 03</div>
+            <h2 class="scenario-title">📚 Bulletin de notes automatique</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-2">◆ Moyen</span>
+            <span class="tag">dict / fonctions / NumPy</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu es délégué(e) de classe. Le professeur t'a donné la liste des notes de 5 matières pour 4 étudiants. Il te demande de générer automatiquement les bulletins.
+        </div>
+
+        <div class="starter">
+          <div class="starter-label">// Données de départ</div>
+<pre class="code-block"><span class="var">classe</span> = {
+    <span class="str">"Alice"</span>:   {<span class="str">"Maths"</span>:<span class="num">15</span>, <span class="str">"Physique"</span>:<span class="num">13</span>, <span class="str">"Info"</span>:<span class="num">18</span>, <span class="str">"Anglais"</span>:<span class="num">12</span>, <span class="str">"Français"</span>:<span class="num">14</span>},
+    <span class="str">"Bob"</span>:     {<span class="str">"Maths"</span>: <span class="num">9</span>, <span class="str">"Physique"</span>: <span class="num">7</span>, <span class="str">"Info"</span>:<span class="num">11</span>, <span class="str">"Anglais"</span>:<span class="num">14</span>, <span class="str">"Français"</span>: <span class="num">8</span>},
+    <span class="str">"Clara"</span>:   {<span class="str">"Maths"</span>:<span class="num">17</span>, <span class="str">"Physique"</span>:<span class="num">16</span>, <span class="str">"Info"</span>:<span class="num">14</span>, <span class="str">"Anglais"</span>:<span class="num">19</span>, <span class="str">"Français"</span>:<span class="num">15</span>},
+    <span class="str">"Damien"</span>:  {<span class="str">"Maths"</span>:<span class="num">10</span>, <span class="str">"Physique"</span>:<span class="num">12</span>, <span class="str">"Info"</span>: <span class="num">9</span>, <span class="str">"Anglais"</span>: <span class="num">7</span>, <span class="str">"Français"</span>:<span class="num">11</span>}
+}</pre>
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Écrire une fonction <code>calcul_bulletin(nom, notes_dict)</code> qui affiche toutes les notes et la moyenne avec <strong>NumPy</strong>.</li>
+            <li>Afficher le classement de la classe du meilleur au moins bon.</li>
+            <li>Identifier la <strong>matière la plus forte</strong> et la <strong>plus faible</strong> de chaque étudiant.</li>
+            <li>Calculer la <strong>moyenne de classe par matière</strong> avec NumPy.</li>
+            <li><strong>Bonus :</strong> Repérer les étudiants en dessous de la moyenne de classe.</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">classe</span> = {
+    <span class="str">"Alice"</span> : {<span class="str">"Maths"</span>:<span class="num">15</span>,<span class="str">"Physique"</span>:<span class="num">13</span>,<span class="str">"Info"</span>:<span class="num">18</span>,<span class="str">"Anglais"</span>:<span class="num">12</span>,<span class="str">"Français"</span>:<span class="num">14</span>},
+    <span class="str">"Bob"</span>   : {<span class="str">"Maths"</span>: <span class="num">9</span>,<span class="str">"Physique"</span>: <span class="num">7</span>,<span class="str">"Info"</span>:<span class="num">11</span>,<span class="str">"Anglais"</span>:<span class="num">14</span>,<span class="str">"Français"</span>: <span class="num">8</span>},
+    <span class="str">"Clara"</span> : {<span class="str">"Maths"</span>:<span class="num">17</span>,<span class="str">"Physique"</span>:<span class="num">16</span>,<span class="str">"Info"</span>:<span class="num">14</span>,<span class="str">"Anglais"</span>:<span class="num">19</span>,<span class="str">"Français"</span>:<span class="num">15</span>},
+    <span class="str">"Damien"</span>: {<span class="str">"Maths"</span>:<span class="num">10</span>,<span class="str">"Physique"</span>:<span class="num">12</span>,<span class="str">"Info"</span>: <span class="num">9</span>,<span class="str">"Anglais"</span>: <span class="num">7</span>,<span class="str">"Français"</span>:<span class="num">11</span>},
+}
+
+<span class="kw">def</span> <span class="fn">calcul_bulletin</span>(<span class="var">nom</span>, <span class="var">notes</span>):
+    <span class="var">vals</span>    = np.<span class="fn">array</span>(<span class="fn">list</span>(<span class="var">notes</span>.values()))
+    <span class="var">moyenne</span> = np.<span class="fn">mean</span>(<span class="var">vals</span>)
+    <span class="var">matieres</span>= <span class="fn">list</span>(<span class="var">notes</span>.keys())
+    <span class="var">forte</span>   = <span class="var">matieres</span>[np.<span class="fn">argmax</span>(<span class="var">vals</span>)]
+    <span class="var">faible</span>  = <span class="var">matieres</span>[np.<span class="fn">argmin</span>(<span class="var">vals</span>)]
+    <span class="fn">print</span>(<span class="str">f"\n{'='*35}"</span>)
+    <span class="fn">print</span>(<span class="str">f"  BULLETIN — {nom}"</span>)
+    <span class="fn">print</span>(<span class="str">f"{'='*35}"</span>)
+    <span class="kw">for</span> <span class="var">mat</span>, <span class="var">n</span> <span class="kw">in</span> <span class="var">notes</span>.items():
+        <span class="fn">print</span>(<span class="str">f"  {mat:<12} {n:>4}/20"</span>)
+    <span class="fn">print</span>(<span class="str">f"  {'Moyenne':<12} {moyenne:>5.2f}/20"</span>)
+    <span class="fn">print</span>(<span class="str">f"  ✅ Point fort  : {forte}"</span>)
+    <span class="fn">print</span>(<span class="str">f"  ⚠️  Point faible : {faible}"</span>)
+    <span class="kw">return</span> <span class="var">moyenne</span>
+
+<span class="cm"># Génération des bulletins + classement</span>
+<span class="var">moyennes</span> = {}
+<span class="kw">for</span> <span class="var">nom</span>, <span class="var">notes</span> <span class="kw">in</span> <span class="var">classe</span>.items():
+    <span class="var">moyennes</span>[<span class="var">nom</span>] = <span class="fn">calcul_bulletin</span>(<span class="var">nom</span>, <span class="var">notes</span>)
+
+<span class="cm"># Classement</span>
+<span class="var">classement</span> = <span class="fn">sorted</span>(<span class="var">moyennes</span>.items(), key=<span class="kw">lambda</span> <span class="var">x</span>: <span class="var">x</span>[<span class="num">1</span>], reverse=<span class="kw">True</span>)
+<span class="fn">print</span>(<span class="str">"\n🏆 Classement :"</span>)
+<span class="kw">for</span> <span class="var">rang</span>, (<span class="var">nom</span>, <span class="var">moy</span>) <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">classement</span>, <span class="num">1</span>):
+    <span class="fn">print</span>(<span class="str">f"  {rang}. {nom:<10} {moy:.2f}/20"</span>)
+
+<span class="cm"># Moyenne par matière (NumPy)</span>
+<span class="var">matieres</span> = <span class="fn">list</span>(<span class="fn">next</span>(<span class="fn">iter</span>(<span class="var">classe</span>.values())).keys())
+<span class="var">matrice</span>  = np.<span class="fn">array</span>([[<span class="var">v</span> <span class="kw">for</span> <span class="var">v</span> <span class="kw">in</span> <span class="var">n</span>.values()] <span class="kw">for</span> <span class="var">n</span> <span class="kw">in</span> <span class="var">classe</span>.values()])
+<span class="fn">print</span>(<span class="str">"\n📊 Moyennes par matière :"</span>)
+<span class="kw">for</span> <span class="var">mat</span>, <span class="var">moy</span> <span class="kw">in</span> <span class="fn">zip</span>(<span class="var">matieres</span>, <span class="var">matrice</span>.<span class="fn">mean</span>(axis=<span class="num">0</span>)):
+    <span class="fn">print</span>(<span class="str">f"  {mat:<12} {moy:.2f}/20"</span>)</pre>
+          </div>
+        </div>
+
+        <div class="retenir c-purple">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li><code>np.argmax()</code> / <code>np.argmin()</code> retournent l'<strong>index</strong> du max/min — très utile pour retrouver la matière correspondante.</li>
+              <li><code>sorted(items, key=lambda x: x[1], reverse=True)</code> = trier un dictionnaire par valeur.</li>
+              <li><code>matrice.mean(axis=0)</code> = moyenne par colonne (par matière) ; <code>axis=1</code> = par ligne (par étudiant).</li>
+              <li><code>zip(liste1, liste2)</code> = itérer sur deux listes en parallèle.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCÉNARIO 4 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe orange"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 04</div>
+            <h2 class="scenario-title">🔐 Générateur et vérificateur de mots de passe</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-2">◆ Moyen</span>
+            <span class="tag">str / fonctions / random</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu développes un outil de sécurité pour aider les utilisateurs à créer des mots de passe forts et vérifier si leurs mots de passe existants sont sécurisés.
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Écrire <code>verifier_mdp(mdp)</code> qui vérifie : longueur ≥ 8, au moins 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial. Retourner un score de 0 à 5 et un niveau ("Très faible" à "Fort").</li>
+            <li>Écrire <code>generer_mdp(longueur=12)</code> qui génère un mot de passe aléatoire fort.</li>
+            <li>Afficher le résultat sous forme de rapport lisible.</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">import</span> random
+<span class="kw">import</span> string
+
+<span class="kw">def</span> <span class="fn">verifier_mdp</span>(<span class="var">mdp</span>):
+    <span class="var">criteres</span> = {
+        <span class="str">"Longueur ≥ 8"</span>       : <span class="fn">len</span>(<span class="var">mdp</span>) >= <span class="num">8</span>,
+        <span class="str">"Majuscule"</span>          : <span class="fn">any</span>(<span class="var">c</span>.isupper() <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">mdp</span>),
+        <span class="str">"Minuscule"</span>          : <span class="fn">any</span>(<span class="var">c</span>.islower() <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">mdp</span>),
+        <span class="str">"Chiffre"</span>            : <span class="fn">any</span>(<span class="var">c</span>.isdigit() <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">mdp</span>),
+        <span class="str">"Caractère spécial"</span>  : <span class="fn">any</span>(<span class="var">c</span> <span class="kw">in</span> string.punctuation <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">mdp</span>),
+    }
+    <span class="var">score</span>  = <span class="fn">sum</span>(<span class="var">criteres</span>.values())
+    <span class="var">niveaux</span>= [<span class="str">"Très faible"</span>, <span class="str">"Faible"</span>, <span class="str">"Moyen"</span>, <span class="str">"Bon"</span>, <span class="str">"Très bon"</span>, <span class="str">"Fort"</span>]
+
+    <span class="fn">print</span>(<span class="str">f"\n🔐 Analyse de '{mdp}'"</span>)
+    <span class="kw">for</span> <span class="var">crit</span>, <span class="var">ok</span> <span class="kw">in</span> <span class="var">criteres</span>.items():
+        <span class="fn">print</span>(<span class="str">f"  {'✅' if ok else '❌'}  {crit}"</span>)
+    <span class="fn">print</span>(<span class="str">f"\n  Score  : {score}/5 — {niveaux[score]}"</span>)
+    <span class="kw">return</span> <span class="var">score</span>
+
+<span class="kw">def</span> <span class="fn">generer_mdp</span>(<span class="var">longueur</span>=<span class="num">12</span>):
+    <span class="var">chars</span> = (string.ascii_letters + string.digits + <span class="str">"@#$%!&*"</span>)
+    <span class="cm"># Garantir au moins un de chaque type</span>
+    <span class="var">mdp</span> = [
+        random.<span class="fn">choice</span>(string.ascii_uppercase),
+        random.<span class="fn">choice</span>(string.ascii_lowercase),
+        random.<span class="fn">choice</span>(string.digits),
+        random.<span class="fn">choice</span>(<span class="str">"@#$%!&*"</span>),
+    ]
+    <span class="var">mdp</span> += [random.<span class="fn">choice</span>(<span class="var">chars</span>) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="var">longueur</span> - <span class="num">4</span>)]
+    random.<span class="fn">shuffle</span>(<span class="var">mdp</span>)
+    <span class="kw">return</span> <span class="str">""</span>.<span class="fn">join</span>(<span class="var">mdp</span>)
+
+<span class="cm"># Test</span>
+<span class="fn">verifier_mdp</span>(<span class="str">"bonjour"</span>)
+<span class="fn">verifier_mdp</span>(<span class="str">"Python3#!"</span>)
+<span class="var">nouveau</span> = <span class="fn">generer_mdp</span>()
+<span class="fn">print</span>(<span class="str">f"\n✨ Mot de passe généré : {nouveau}"</span>)
+<span class="fn">verifier_mdp</span>(<span class="var">nouveau</span>)</pre>
+          </div>
+        </div>
+
+        <div class="retenir c-orange">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li><code>any(condition for x in iterable)</code> = vrai si <strong>au moins un</strong> élément satisfait la condition.</li>
+              <li><code>str.isupper()</code>, <code>str.islower()</code>, <code>str.isdigit()</code> = méthodes de classification des caractères.</li>
+              <li><code>string.ascii_letters</code>, <code>string.digits</code>, <code>string.punctuation</code> = constantes du module <code>string</code>.</li>
+              <li><code>"".join(liste)</code> = assembler une liste de caractères en chaîne.</li>
+              <li><code>random.shuffle(liste)</code> = mélange <em>en place</em> (modifie la liste).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DOMAINE 3 : PROFESSIONNEL ============ -->
+  <div class="chapter-divider"><span>💼 Contexte professionnel</span></div>
+
+  <!-- SCÉNARIO 5 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe purple"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 05</div>
+            <h2 class="scenario-title">🛒 Caisse enregistreuse simplifiée</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-2">◆ Moyen</span>
+            <span class="tag">dict / boucles / fonctions</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu travailles dans une petite boutique. Le gérant te demande de créer un programme de caisse simple pour calculer les totaux, appliquer des remises et afficher un ticket de caisse.
+        </div>
+
+        <div class="starter">
+          <div class="starter-label">// Catalogue produits</div>
+<pre class="code-block"><span class="var">catalogue</span> = {
+    <span class="str">"pomme"</span>   : <span class="num">0.80</span>,
+    <span class="str">"pain"</span>    : <span class="num">1.20</span>,
+    <span class="str">"lait"</span>    : <span class="num">0.95</span>,
+    <span class="str">"fromage"</span> : <span class="num">3.50</span>,
+    <span class="str">"yaourt"</span>  : <span class="num">2.10</span>,
+}</pre>
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Permettre à l'utilisateur d'ajouter des articles à son panier (nom + quantité) jusqu'à saisir <code>"fin"</code>. Gérer les articles inconnus.</li>
+            <li>Calculer le sous-total, appliquer une remise de <strong>10% si total > 20€</strong>.</li>
+            <li>Afficher un <strong>ticket de caisse formaté</strong> avec article, quantité, prix unitaire et total ligne.</li>
+            <li><strong>Bonus :</strong> Calculer la TVA à 5,5% et afficher le total TTC.</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="var">catalogue</span> = {
+    <span class="str">"pomme"</span>:<span class="num">0.80</span>, <span class="str">"pain"</span>:<span class="num">1.20</span>, <span class="str">"lait"</span>:<span class="num">0.95</span>,
+    <span class="str">"fromage"</span>:<span class="num">3.50</span>, <span class="str">"yaourt"</span>:<span class="num">2.10</span>
+}
+
+<span class="kw">def</span> <span class="fn">saisir_panier</span>():
+    <span class="var">panier</span> = {}
+    <span class="fn">print</span>(<span class="str">"Articles disponibles :"</span>, <span class="str">", "</span>.<span class="fn">join</span>(<span class="var">catalogue</span>.keys()))
+    <span class="kw">while True</span>:
+        <span class="var">article</span> = <span class="fn">input</span>(<span class="str">"Article (ou 'fin') : "</span>).lower()
+        <span class="kw">if</span> <span class="var">article</span> == <span class="str">"fin"</span>: <span class="kw">break</span>
+        <span class="kw">if</span> <span class="var">article</span> <span class="kw">not in</span> <span class="var">catalogue</span>:
+            <span class="fn">print</span>(<span class="str">"❌ Article inconnu."</span>); <span class="kw">continue</span>
+        <span class="var">qte</span> = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">f"Quantité de {article} : "</span>))
+        <span class="var">panier</span>[<span class="var">article</span>] = <span class="var">panier</span>.<span class="fn">get</span>(<span class="var">article</span>, <span class="num">0</span>) + <span class="var">qte</span>
+    <span class="kw">return</span> <span class="var">panier</span>
+
+<span class="kw">def</span> <span class="fn">ticket</span>(<span class="var">panier</span>):
+    <span class="fn">print</span>(<span class="str">"\n" + "="*42</span>)
+    <span class="fn">print</span>(<span class="str">"        🧾 TICKET DE CAISSE"</span>)
+    <span class="fn">print</span>(<span class="str">"="*42</span>)
+    <span class="fn">print</span>(<span class="str">f"{'Article':<12} {'Qté':>4} {'P.U.':>7} {'Total':>8}"</span>)
+    <span class="fn">print</span>(<span class="str">"-"*42</span>)
+    <span class="var">sous_total</span> = <span class="num">0</span>
+    <span class="kw">for</span> <span class="var">art</span>, <span class="var">qte</span> <span class="kw">in</span> <span class="var">panier</span>.items():
+        <span class="var">pu</span>    = <span class="var">catalogue</span>[<span class="var">art</span>]
+        <span class="var">ligne</span> = <span class="var">pu</span> * <span class="var">qte</span>
+        <span class="var">sous_total</span> += <span class="var">ligne</span>
+        <span class="fn">print</span>(<span class="str">f"{art:<12} {qte:>4} {pu:>7.2f}€ {ligne:>8.2f}€"</span>)
+    <span class="fn">print</span>(<span class="str">"="*42</span>)
+
+    <span class="var">remise</span> = <span class="var">sous_total</span> * <span class="num">0.10</span> <span class="kw">if</span> <span class="var">sous_total</span> > <span class="num">20</span> <span class="kw">else</span> <span class="num">0</span>
+    <span class="var">net</span>    = <span class="var">sous_total</span> - <span class="var">remise</span>
+    <span class="var">tva</span>    = <span class="var">net</span> * <span class="num">0.055</span>
+    <span class="var">ttc</span>    = <span class="var">net</span> + <span class="var">tva</span>
+
+    <span class="kw">if</span> <span class="var">remise</span> > <span class="num">0</span>:
+        <span class="fn">print</span>(<span class="str">f"{'Sous-total':<22} {sous_total:>8.2f}€"</span>)
+        <span class="fn">print</span>(<span class="str">f"{'Remise 10%':<22} {-remise:>8.2f}€"</span>)
+    <span class="fn">print</span>(<span class="str">f"{'Net HT':<22} {net:>8.2f}€"</span>)
+    <span class="fn">print</span>(<span class="str">f"{'TVA 5.5%':<22} {tva:>8.2f}€"</span>)
+    <span class="fn">print</span>(<span class="str">f"{'TOTAL TTC':<22} {ttc:>8.2f}€"</span>)
+    <span class="fn">print</span>(<span class="str">"="*42</span>)
+
+<span class="var">panier</span> = <span class="fn">saisir_panier</span>()
+<span class="kw">if</span> <span class="var">panier</span>:
+    <span class="fn">ticket</span>(<span class="var">panier</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"Panier vide."</span>)</pre>
+          </div>
+        </div>
+
+        <div class="retenir c-blue">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li><code>dict.get(clé, valeur_défaut)</code> = récupérer sans erreur, et initialiser à 0 si absent.</li>
+              <li><code>continue</code> dans une boucle = sauter directement à l'itération suivante.</li>
+              <li>Formatage de tableau : <code>{texte:&lt;12}</code> (aligné gauche), <code>{nombre:&gt;8.2f}</code> (aligné droite, 2 déc.).</li>
+              <li>Séparer la <strong>saisie</strong> de l'<strong>affichage</strong> en deux fonctions = bonne pratique.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCÉNARIO 6 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe red"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 06</div>
+            <h2 class="scenario-title">📊 Analyse de données de ventes avec NumPy</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-3">▲ Difficile</span>
+            <span class="tag">NumPy / matrices / stats</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu es analyste junior dans une entreprise. On te donne les ventes mensuelles de 4 produits sur 6 mois. Tu dois produire un rapport statistique complet.
+        </div>
+
+        <div class="starter">
+          <div class="starter-label">// Données (lignes = produits, colonnes = mois Jan→Juin)</div>
+<pre class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="var">ventes</span> = np.<span class="fn">array</span>([
+    [<span class="num">120</span>, <span class="num">135</span>, <span class="num">148</span>, <span class="num">162</span>, <span class="num">175</span>, <span class="num">190</span>],  <span class="cm"># Produit A</span>
+    [ <span class="num">85</span>,  <span class="num">92</span>,  <span class="num">78</span>,  <span class="num">95</span>,  <span class="num">88</span>,  <span class="num">102</span>],  <span class="cm"># Produit B</span>
+    [<span class="num">200</span>, <span class="num">215</span>, <span class="num">198</span>, <span class="num">220</span>, <span class="num">235</span>, <span class="num">248</span>],  <span class="cm"># Produit C</span>
+    [ <span class="num">45</span>,  <span class="num">52</span>,  <span class="num">61</span>,  <span class="num">49</span>,  <span class="num">70</span>,  <span class="num">75</span>],  <span class="cm"># Produit D</span>
+])</pre>
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Calculer le total des ventes par produit et par mois avec <code>sum(axis=...)</code>.</li>
+            <li>Identifier le mois le plus performant et le produit le plus vendu.</li>
+            <li>Calculer la <strong>croissance mensuelle</strong> en % pour chaque produit (utiliser le slicing NumPy).</li>
+            <li>Normaliser les données entre 0 et 1 avec NumPy (min-max scaling).</li>
+            <li>Afficher un rapport complet et lisible.</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">ventes</span> = np.<span class="fn">array</span>([
+    [<span class="num">120</span>,<span class="num">135</span>,<span class="num">148</span>,<span class="num">162</span>,<span class="num">175</span>,<span class="num">190</span>],
+    [ <span class="num">85</span>, <span class="num">92</span>, <span class="num">78</span>, <span class="num">95</span>, <span class="num">88</span>,<span class="num">102</span>],
+    [<span class="num">200</span>,<span class="num">215</span>,<span class="num">198</span>,<span class="num">220</span>,<span class="num">235</span>,<span class="num">248</span>],
+    [ <span class="num">45</span>, <span class="num">52</span>, <span class="num">61</span>, <span class="num">49</span>, <span class="num">70</span>, <span class="num">75</span>],
+])
+
+<span class="var">produits</span> = [<span class="str">"Produit A"</span>, <span class="str">"Produit B"</span>, <span class="str">"Produit C"</span>, <span class="str">"Produit D"</span>]
+<span class="var">mois</span>     = [<span class="str">"Jan"</span>,<span class="str">"Fév"</span>,<span class="str">"Mar"</span>,<span class="str">"Avr"</span>,<span class="str">"Mai"</span>,<span class="str">"Jun"</span>]
+
+<span class="cm"># 1. Totaux</span>
+<span class="var">total_par_produit</span> = <span class="var">ventes</span>.<span class="fn">sum</span>(axis=<span class="num">1</span>)   <span class="cm"># somme par ligne</span>
+<span class="var">total_par_mois</span>    = <span class="var">ventes</span>.<span class="fn">sum</span>(axis=<span class="num">0</span>)   <span class="cm"># somme par colonne</span>
+
+<span class="fn">print</span>(<span class="str">"📦 Total par produit :"</span>)
+<span class="kw">for</span> <span class="var">p</span>, <span class="var">t</span> <span class="kw">in</span> <span class="fn">zip</span>(<span class="var">produits</span>, <span class="var">total_par_produit</span>):
+    <span class="fn">print</span>(<span class="str">f"  {p} : {t} unités"</span>)
+
+<span class="cm"># 2. Meilleur mois et meilleur produit</span>
+<span class="var">meilleur_mois</span>    = <span class="var">mois</span>[np.<span class="fn">argmax</span>(<span class="var">total_par_mois</span>)]
+<span class="var">meilleur_produit</span> = <span class="var">produits</span>[np.<span class="fn">argmax</span>(<span class="var">total_par_produit</span>)]
+<span class="fn">print</span>(<span class="str">f"\n🏆 Meilleur mois    : {meilleur_mois}"</span>)
+<span class="fn">print</span>(<span class="str">f"🥇 Meilleur produit : {meilleur_produit}"</span>)
+
+<span class="cm"># 3. Croissance mensuelle (%)</span>
+<span class="cm">#    diff entre mois[i+1] et mois[i], divisé par mois[i]</span>
+<span class="var">croissance</span> = ((<span class="var">ventes</span>[:, <span class="num">1</span>:] - <span class="var">ventes</span>[:, :-<span class="num">1</span>]) / <span class="var">ventes</span>[:, :-<span class="num">1</span>]) * <span class="num">100</span>
+<span class="fn">print</span>(<span class="str">"\n📈 Croissance mensuelle (%) :"</span>)
+<span class="kw">for</span> <span class="var">p</span>, <span class="var">ligne</span> <span class="kw">in</span> <span class="fn">zip</span>(<span class="var">produits</span>, <span class="var">croissance</span>):
+    <span class="var">vals</span> = <span class="str">"  "</span>.<span class="fn">join</span>([<span class="str">f"{v:+.1f}%"</span> <span class="kw">for</span> <span class="var">v</span> <span class="kw">in</span> <span class="var">ligne</span>])
+    <span class="fn">print</span>(<span class="str">f"  {p}: {vals}"</span>)
+
+<span class="cm"># 4. Normalisation min-max</span>
+<span class="var">v_min</span>  = <span class="var">ventes</span>.<span class="fn">min</span>()
+<span class="var">v_max</span>  = <span class="var">ventes</span>.<span class="fn">max</span>()
+<span class="var">normal</span> = (<span class="var">ventes</span> - <span class="var">v_min</span>) / (<span class="var">v_max</span> - <span class="var">v_min</span>)
+<span class="fn">print</span>(<span class="str">"\n📐 Données normalisées (extrait) :"</span>)
+<span class="fn">print</span>(np.<span class="fn">round</span>(<span class="var">normal</span>, <span class="num">2</span>))</pre>
+          </div>
+        </div>
+
+        <div class="retenir c-red">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li><code>axis=0</code> = opération sur les <strong>colonnes</strong> (vertical), <code>axis=1</code> = sur les <strong>lignes</strong> (horizontal).</li>
+              <li>Slicing 2D : <code>A[:, 1:]</code> = toutes les lignes, colonnes à partir de la 2e.</li>
+              <li>La <strong>vectorisation NumPy</strong> permet d'éviter totalement les boucles sur des matrices.</li>
+              <li>Normalisation min-max : <code>(x - min) / (max - min)</code> — ramène toutes les valeurs entre 0 et 1.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DOMAINE 4 : ALGORITHMES CLASSIQUES ============ -->
+  <div class="chapter-divider"><span>⚙️ Algorithmes classiques</span></div>
+
+  <!-- SCÉNARIO 7 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe green"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 07</div>
+            <h2 class="scenario-title">🔢 Chiffrement César</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-2">◆ Moyen</span>
+            <span class="tag">str / fonctions / ord / chr</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu veux encoder des messages secrets à envoyer à tes amis. Le chiffrement César consiste à décaler chaque lettre de l'alphabet d'un nombre fixe de positions.
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Écrire <code>chiffrer(texte, decalage)</code> qui chiffre un texte (garder les espaces et ponctuations inchangés, gérer majuscules et minuscules).</li>
+            <li>Écrire <code>dechiffrer(texte, decalage)</code> en réutilisant <code>chiffrer</code>.</li>
+            <li><strong>Bonus :</strong> Écrire <code>casser_cesar(texte)</code> qui essaie tous les décalages et affiche les 26 possibilités.</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">def</span> <span class="fn">chiffrer</span>(<span class="var">texte</span>, <span class="var">decalage</span>):
+    <span class="var">resultat</span> = <span class="str">""</span>
+    <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">texte</span>:
+        <span class="kw">if</span> <span class="var">c</span>.isalpha():
+            <span class="var">base</span> = <span class="fn">ord</span>(<span class="str">'A'</span>) <span class="kw">if</span> <span class="var">c</span>.isupper() <span class="kw">else</span> <span class="fn">ord</span>(<span class="str">'a'</span>)
+            <span class="var">resultat</span> += <span class="fn">chr</span>((<span class="fn">ord</span>(<span class="var">c</span>) - <span class="var">base</span> + <span class="var">decalage</span>) % <span class="num">26</span> + <span class="var">base</span>)
+        <span class="kw">else</span>:
+            <span class="var">resultat</span> += <span class="var">c</span>   <span class="cm"># espaces, ponctuation inchangés</span>
+    <span class="kw">return</span> <span class="var">resultat</span>
+
+<span class="kw">def</span> <span class="fn">dechiffrer</span>(<span class="var">texte</span>, <span class="var">decalage</span>):
+    <span class="kw">return</span> <span class="fn">chiffrer</span>(<span class="var">texte</span>, -<span class="var">decalage</span>)
+
+<span class="kw">def</span> <span class="fn">casser_cesar</span>(<span class="var">texte</span>):
+    <span class="fn">print</span>(<span class="str">"🔓 Toutes les possibilités :"</span>)
+    <span class="kw">for</span> <span class="var">d</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">26</span>):
+        <span class="fn">print</span>(<span class="str">f"  Décalage {d:>2} : {chiffrer(texte, d)}"</span>)
+
+<span class="cm"># Test</span>
+<span class="var">msg</span>     = <span class="str">"Bonjour Python !"</span>
+<span class="var">chiffre</span> = <span class="fn">chiffrer</span>(<span class="var">msg</span>, <span class="num">3</span>)
+<span class="fn">print</span>(<span class="str">f"Chiffré : {chiffre}"</span>)
+<span class="fn">print</span>(<span class="str">f"Déchiffré : {dechiffrer(chiffre, 3)}"</span>)
+<span class="fn">casser_cesar</span>(<span class="var">chiffre</span>)</pre>
+          </div>
+        </div>
+
+        <div class="retenir c-green">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li><code>ord(c)</code> = code ASCII d'un caractère ; <code>chr(n)</code> = caractère depuis un code ASCII.</li>
+              <li>Le <code>% 26</code> assure le <strong>bouclage</strong> dans l'alphabet (Z → A).</li>
+              <li>Déchiffrer = chiffrer avec le décalage <strong>opposé</strong> : éviter la duplication de code.</li>
+              <li>Principe de <strong>réutilisation</strong> : une bonne fonction peut être appelée par d'autres fonctions.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCÉNARIO 8 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe blue"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 08</div>
+            <h2 class="scenario-title">📅 Calendrier et gestion du temps</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-2">◆ Moyen</span>
+            <span class="tag">conditions / boucles / fonctions</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu dois créer un outil qui aide à planifier des événements en calculant des informations sur les dates et les jours.
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Écrire <code>est_bissextile(annee)</code>.</li>
+            <li>Écrire <code>jours_dans_mois(mois, annee)</code> qui retourne le nombre de jours du mois.</li>
+            <li>Écrire <code>jours_restants_annee(jour, mois, annee)</code> qui calcule les jours restants dans l'année.</li>
+            <li><strong>Bonus :</strong> Afficher un mini-calendrier textuel d'un mois donné (supposer que le 1er janvier est un lundi).</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">def</span> <span class="fn">est_bissextile</span>(<span class="var">a</span>):
+    <span class="kw">return</span> (<span class="var">a</span> % <span class="num">4</span> == <span class="num">0</span> <span class="kw">and</span> <span class="var">a</span> % <span class="num">100</span> != <span class="num">0</span>) <span class="kw">or</span> (<span class="var">a</span> % <span class="num">400</span> == <span class="num">0</span>)
+
+<span class="kw">def</span> <span class="fn">jours_dans_mois</span>(<span class="var">mois</span>, <span class="var">annee</span>):
+    <span class="var">jours</span> = [<span class="num">0</span>,<span class="num">31</span>,<span class="num">28</span>,<span class="num">31</span>,<span class="num">30</span>,<span class="num">31</span>,<span class="num">30</span>,<span class="num">31</span>,<span class="num">31</span>,<span class="num">30</span>,<span class="num">31</span>,<span class="num">30</span>,<span class="num">31</span>]
+    <span class="kw">if</span> <span class="var">mois</span> == <span class="num">2</span> <span class="kw">and</span> <span class="fn">est_bissextile</span>(<span class="var">annee</span>):
+        <span class="kw">return</span> <span class="num">29</span>
+    <span class="kw">return</span> <span class="var">jours</span>[<span class="var">mois</span>]
+
+<span class="kw">def</span> <span class="fn">jours_restants_annee</span>(<span class="var">jour</span>, <span class="var">mois</span>, <span class="var">annee</span>):
+    <span class="var">total</span> = <span class="fn">sum</span>(<span class="fn">jours_dans_mois</span>(<span class="var">m</span>, <span class="var">annee</span>) <span class="kw">for</span> <span class="var">m</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="var">mois</span>+<span class="num">1</span>, <span class="num">13</span>))
+    <span class="var">total</span> += <span class="fn">jours_dans_mois</span>(<span class="var">mois</span>, <span class="var">annee</span>) - <span class="var">jour</span>
+    <span class="kw">return</span> <span class="var">total</span>
+
+<span class="cm"># Bonus : mini calendrier (en supposant que le 1er janv est Lun)</span>
+<span class="kw">def</span> <span class="fn">calendrier</span>(<span class="var">mois</span>, <span class="var">annee</span>, <span class="var">premier_jour</span>=<span class="num">0</span>):
+    <span class="var">noms</span>  = [<span class="str">""</span>,<span class="str">"Janvier"</span>,<span class="str">"Février"</span>,<span class="str">"Mars"</span>,<span class="str">"Avril"</span>,
+              <span class="str">"Mai"</span>,<span class="str">"Juin"</span>,<span class="str">"Juillet"</span>,<span class="str">"Août"</span>,<span class="str">"Sept."</span>,<span class="str">"Oct."</span>,<span class="str">"Nov."</span>,<span class="str">"Déc."</span>]
+    <span class="fn">print</span>(<span class="str">f"\n  {noms[mois]} {annee}"</span>)
+    <span class="fn">print</span>(<span class="str">"  Lu Ma Me Je Ve Sa Di"</span>)
+    <span class="var">ligne</span> = <span class="str">"     "</span> * <span class="var">premier_jour</span>
+    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="fn">jours_dans_mois</span>(<span class="var">mois</span>, <span class="var">annee</span>) + <span class="num">1</span>):
+        <span class="var">ligne</span> += <span class="str">f"{j:>3} "</span>
+        <span class="kw">if</span> (<span class="var">premier_jour</span> + <span class="var">j</span>) % <span class="num">7</span> == <span class="num">0</span>:
+            <span class="fn">print</span>(<span class="str">" "</span> + <span class="var">ligne</span>); <span class="var">ligne</span> = <span class="str">""</span>
+    <span class="kw">if</span> <span class="var">ligne</span>.strip(): <span class="fn">print</span>(<span class="str">" "</span> + <span class="var">ligne</span>)
+
+<span class="cm"># Tests</span>
+<span class="fn">print</span>(<span class="fn">est_bissextile</span>(<span class="num">2024</span>))                        <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="fn">jours_dans_mois</span>(<span class="num">2</span>, <span class="num">2024</span>))                   <span class="cm"># 29</span>
+<span class="fn">print</span>(<span class="fn">jours_restants_annee</span>(<span class="num">15</span>, <span class="num">6</span>, <span class="num">2025</span>), <span class="str">"jours"</span>) <span class="cm"># 199</span>
+<span class="fn">calendrier</span>(<span class="num">1</span>, <span class="num">2025</span>, <span class="num">2</span>)                             <span class="cm"># Mercredi 1er jan 2025</span></pre>
+          </div>
+        </div>
+
+        <div class="retenir c-purple">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li>Décomposer : <code>jours_restants</code> appelle <code>jours_dans_mois</code> qui appelle <code>est_bissextile</code> — <strong>hiérarchie de fonctions</strong>.</li>
+              <li><code>sum(f(x) for x in range(...))</code> = somme avec une <strong>expression génératrice</strong>.</li>
+              <li>Listes indexées à partir de 1 : mettre un <code>0</code> en position 0 pour aligner les indices sur les numéros de mois.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DOMAINE 5 : AVANCÉ ============ -->
+  <div class="chapter-divider"><span>🚀 Niveau avancé</span></div>
+
+  <!-- SCÉNARIO 9 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe purple"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 09</div>
+            <h2 class="scenario-title">🧬 Simulation de population bactérienne</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-3">▲ Difficile</span>
+            <span class="tag">NumPy / linspace / simulation</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> En TP de biologie, tu modélises la croissance d'une population de bactéries selon le modèle logistique : la population croît rapidement au début puis ralentit quand elle atteint la capacité maximale du milieu.
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Implémenter la formule : <code>N(t) = K / (1 + ((K - N0) / N0) * exp(-r*t))</code> avec <code>K=1000</code> (capacité max), <code>N0=10</code> (population initiale), <code>r=0.5</code> (taux de croissance).</li>
+            <li>Créer un tableau de temps avec <code>np.linspace(0, 20, 100)</code>.</li>
+            <li>Calculer la population à chaque instant avec NumPy (<strong>sans boucle</strong>).</li>
+            <li>Afficher les valeurs à t=0, 5, 10, 15, 20 sous forme de tableau.</li>
+            <li>Trouver le moment où la population dépasse 500 (la moitié de K).</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Paramètres</span>
+<span class="var">K</span>  = <span class="num">1000</span>     <span class="cm"># Capacité maximale</span>
+<span class="var">N0</span> = <span class="num">10</span>       <span class="cm"># Population initiale</span>
+<span class="var">r</span>  = <span class="num">0.5</span>      <span class="cm"># Taux de croissance</span>
+
+<span class="cm"># Temps : 100 points entre 0 et 20</span>
+<span class="var">t</span> = np.<span class="fn">linspace</span>(<span class="num">0</span>, <span class="num">20</span>, <span class="num">100</span>)
+
+<span class="cm"># Modèle logistique — vectorisé</span>
+<span class="var">N</span> = <span class="var">K</span> / (<span class="num">1</span> + ((<span class="var">K</span> - <span class="var">N0</span>) / <span class="var">N0</span>) * np.<span class="fn">exp</span>(-<span class="var">r</span> * <span class="var">t</span>))
+
+<span class="cm"># Affichage à des instants clés</span>
+<span class="fn">print</span>(<span class="str">f"{'Temps':>6}  {'Population':>12}"</span>)
+<span class="fn">print</span>(<span class="str">"-"*22</span>)
+<span class="kw">for</span> <span class="var">temps</span> <span class="kw">in</span> [<span class="num">0</span>, <span class="num">5</span>, <span class="num">10</span>, <span class="num">15</span>, <span class="num">20</span>]:
+    <span class="cm"># Trouver l'index le plus proche du temps souhaité</span>
+    <span class="var">idx</span> = np.<span class="fn">argmin</span>(np.<span class="fn">abs</span>(<span class="var">t</span> - <span class="var">temps</span>))
+    <span class="fn">print</span>(<span class="str">f"{temps:>6}  {N[idx]:>12.2f}"</span>)
+
+<span class="cm"># Trouver quand N > 500</span>
+<span class="var">idx_500</span> = np.<span class="fn">argmax</span>(<span class="var">N</span> > <span class="num">500</span>)  <span class="cm"># argmax retourne le 1er True</span>
+<span class="fn">print</span>(<span class="str">f"\n⏱️  Population > 500 à t ≈ {t[idx_500]:.2f} heures"</span>)
+<span class="fn">print</span>(<span class="str">f"   Valeur : {N[idx_500]:.2f} bactéries"</span>)
+
+<span class="cm"># Statistiques NumPy</span>
+<span class="fn">print</span>(<span class="str">f"\n📊 Croissance moyenne : {np.diff(N).mean():.4f} bact/pas"</span>)
+<span class="fn">print</span>(<span class="str">f"   Taux de croissance max à : t ≈ {t[np.argmax(np.diff(N))]:.1f}"</span>)</pre>
+          </div>
+        </div>
+
+        <div class="retenir c-blue">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li><code>np.exp()</code>, <code>np.log()</code>, <code>np.abs()</code> = fonctions mathématiques <strong>vectorisées</strong>.</li>
+              <li><code>np.argmax(condition)</code> sur un tableau booléen = index du <strong>premier True</strong>.</li>
+              <li><code>np.diff(N)</code> = différences successives : <code>[N[1]-N[0], N[2]-N[1], ...]</code>.</li>
+              <li><code>np.linspace</code> est préféré à <code>arange</code> quand on veut un <strong>nombre précis de points</strong> entre deux valeurs.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCÉNARIO 10 -->
+  <div class="scenario">
+    <div class="scenario-top">
+      <div class="scenario-stripe red"></div>
+      <div class="scenario-inner">
+        <div class="scenario-header">
+          <div>
+            <div class="scenario-id">// SITUATION 10</div>
+            <h2 class="scenario-title">🏦 Simulateur d'emprunt bancaire</h2>
+          </div>
+          <div class="scenario-meta">
+            <span class="tag diff-3">▲ Difficile</span>
+            <span class="tag">NumPy / fonctions / tableaux</span>
+          </div>
+        </div>
+
+        <div class="scenario-context">
+          <strong>Contexte :</strong> Tu veux emprunter de l'argent pour acheter une voiture. Tu développes un simulateur qui calcule tes mensualités, le total des intérêts payés et génère un tableau d'amortissement.
+        </div>
+
+        <div class="missions">
+          <div class="missions-title">// Missions</div>
+          <ol>
+            <li>Calculer la mensualité avec la formule : <code>M = C × (t/12) / (1 - (1 + t/12)^(-n))</code> où C = capital, t = taux annuel, n = durée en mois.</li>
+            <li>Générer le tableau d'amortissement mois par mois (capital restant, intérêts, remboursement capital).</li>
+            <li>Utiliser <strong>NumPy</strong> pour calculer les totaux sans boucle là où c'est possible.</li>
+            <li>Afficher un résumé : coût total, total intérêts, mensualité.</li>
+            <li><strong>Bonus :</strong> Comparer 3 durées de prêt (3, 5, 7 ans) et afficher laquelle coûte le moins cher.</li>
+          </ol>
+        </div>
+
+        <div class="answer-section">
+          <button class="answer-toggle" onclick="toggleAnswer(this)">
+            <span>▶</span> Voir le corrigé complet
+            <span class="arr">›</span>
+          </button>
+          <div class="answer-body">
+<pre class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">simuler_pret</span>(<span class="var">capital</span>, <span class="var">taux_annuel</span>, <span class="var">duree_ans</span>, <span class="var">afficher_tableau</span>=<span class="kw">True</span>):
+    <span class="var">t</span> = <span class="var">taux_annuel</span> / <span class="num">12</span>    <span class="cm"># taux mensuel</span>
+    <span class="var">n</span> = <span class="var">duree_ans</span> * <span class="num">12</span>     <span class="cm"># nb mois</span>
+
+    <span class="cm"># Mensualité</span>
+    <span class="var">M</span> = <span class="var">capital</span> * <span class="var">t</span> / (<span class="num">1</span> - (<span class="num">1</span> + <span class="var">t</span>) ** (-<span class="var">n</span>))
+
+    <span class="kw">if</span> <span class="var">afficher_tableau</span>:
+        <span class="fn">print</span>(<span class="str">f"\n{'='*62}"</span>)
+        <span class="fn">print</span>(<span class="str">f"  Prêt : {capital}€  |  Taux : {taux_annuel*100:.1f}%  |  Durée : {duree_ans} ans"</span>)
+        <span class="fn">print</span>(<span class="str">f"  Mensualité : {M:.2f}€"</span>)
+        <span class="fn">print</span>(<span class="str">f"{'='*62}"</span>)
+        <span class="fn">print</span>(<span class="str">f"{'Mois':>5} {'Cap.Restant':>12} {'Intérêts':>10} {'Remb.Cap.':>10}"</span>)
+        <span class="fn">print</span>(<span class="str">"-"*62</span>)
+
+    <span class="var">solde</span>      = <span class="var">capital</span>
+    <span class="var">interets_t</span> = <span class="num">0</span>
+
+    <span class="kw">for</span> <span class="var">mois</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="var">n</span> + <span class="num">1</span>):
+        <span class="var">interets</span> = <span class="var">solde</span> * <span class="var">t</span>
+        <span class="var">remb_cap</span> = <span class="var">M</span> - <span class="var">interets</span>
+        <span class="var">solde</span>   -= <span class="var">remb_cap</span>
+        <span class="var">interets_t</span> += <span class="var">interets</span>
+        <span class="kw">if</span> <span class="var">afficher_tableau</span> <span class="kw">and</span> <span class="var">mois</span> % <span class="num">12</span> == <span class="num">0</span>:  <span class="cm"># afficher 1 ligne / an</span>
+            <span class="fn">print</span>(<span class="str">f"{mois:>5} {max(solde,0):>12.2f}€ {interets:>9.2f}€ {remb_cap:>9.2f}€"</span>)
+
+    <span class="var">total</span> = <span class="var">M</span> * <span class="var">n</span>
+    <span class="kw">if</span> <span class="var">afficher_tableau</span>:
+        <span class="fn">print</span>(<span class="str">f"\n  Total remboursé : {total:.2f}€"</span>)
+        <span class="fn">print</span>(<span class="str">f"  Total intérêts  : {interets_t:.2f}€"</span>)
+
+    <span class="kw">return</span> <span class="var">total</span>, <span class="var">interets_t</span>, <span class="var">M</span>
+
+<span class="cm"># Simulation principale</span>
+<span class="fn">simuler_pret</span>(<span class="num">15000</span>, <span class="num">0.045</span>, <span class="num">5</span>)
+
+<span class="cm"># Bonus : comparaison des durées</span>
+<span class="fn">print</span>(<span class="str">"\n🔍 Comparaison des durées :"</span>)
+<span class="fn">print</span>(<span class="str">f"{'Durée':>8} {'Mensualité':>12} {'Coût total':>12} {'Intérêts':>12}"</span>)
+<span class="fn">print</span>(<span class="str">"-"*48</span>)
+<span class="var">resultats</span> = {}
+<span class="kw">for</span> <span class="var">ans</span> <span class="kw">in</span> [<span class="num">3</span>, <span class="num">5</span>, <span class="num">7</span>]:
+    <span class="var">total</span>, <span class="var">inter</span>, <span class="var">mens</span> = <span class="fn">simuler_pret</span>(<span class="num">15000</span>, <span class="num">0.045</span>, <span class="var">ans</span>, <span class="var">afficher_tableau</span>=<span class="kw">False</span>)
+    <span class="var">resultats</span>[<span class="var">ans</span>] = <span class="var">total</span>
+    <span class="fn">print</span>(<span class="str">f"{ans:>5} ans  {mens:>10.2f}€ {total:>10.2f}€ {inter:>10.2f}€"</span>)
+
+<span class="var">meilleur</span> = <span class="fn">min</span>(<span class="var">resultats</span>, key=<span class="kw">lambda</span> <span class="var">k</span>: <span class="var">resultats</span>[<span class="var">k</span>])
+<span class="fn">print</span>(<span class="str">f"\n✅ Moins cher : {meilleur} ans ({resultats[meilleur]:.2f}€ au total)"</span>)</pre>
+          </div>
+        </div>
+
+        <div class="retenir c-red">
+          <button class="retenir-btn" onclick="toggleRetenir(this)">
+            💡 Ce qu'il faut retenir
+            <span class="ri">▾</span>
+          </button>
+          <div class="retenir-content">
+            <ul>
+              <li>Les fonctions peuvent avoir des <strong>paramètres booléens</strong> (<code>afficher_tableau=True</code>) pour contrôler leur comportement.</li>
+              <li><code>min(dict, key=lambda k: dict[k])</code> = trouver la clé avec la <strong>valeur minimale</strong>.</li>
+              <li>Une même fonction peut être appelée avec des paramètres différents pour <strong>comparer des scénarios</strong>.</li>
+              <li>Afficher une ligne sur N (<code>if mois % 12 == 0</code>) pour des tableaux lisibles.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>TD Python — Situations Pratiques · 10 exercices</p>
+    <p>Chapitres 7 &amp; 8 — Tous niveaux</p>
+  </footer>
+
+</div>
+
+<script>
+function toggleAnswer(btn) {
+  const body = btn.nextElementSibling;
+  body.classList.toggle('visible');
+  btn.classList.toggle('open');
+  const arr = btn.querySelector('.arr');
+  arr.textContent = body.classList.contains('visible') ? '▾' : '›';
+  btn.querySelector('span').textContent = body.classList.contains('visible') ? '▼' : '▶';
+}
+
+function toggleRetenir(btn) {
+  const content = btn.nextElementSibling;
+  content.classList.toggle('visible');
+  btn.classList.toggle('open');
+}
+</script>
+</body>
+</html>

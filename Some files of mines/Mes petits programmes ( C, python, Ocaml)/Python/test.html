@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<meta charset="UTF-8">
+<title>OOP Marche</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --grid: #1a1a2e;
+    --accent: #00ffe7;
+    --accent2: #ff6b35;
+    --text: #e0e0e0;
+    --panel: #10101a;
+    --border: #00ffe733;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel);
+  }
+
+  header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+  }
+
+  .status-bar {
+    display: flex;
+    gap: 24px;
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .status-bar span { color: var(--accent2); }
+
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── GAME CANVAS ── */
+  .game-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .ground {
+    position: absolute;
+    bottom: 60px;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    box-shadow: 0 0 20px var(--accent);
+  }
+
+  /* ── COORDINATES ── */
+  .coord-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s;
+  }
+  .coord-dot.start { background: var(--accent2); box-shadow: 0 0 10px var(--accent2); }
+  .coord-dot.end   { background: var(--accent);  box-shadow: 0 0 10px var(--accent); animation: pulseEnd 1s infinite; }
+
+  @keyframes pulseEnd {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity:1; }
+    50%      { transform: translate(-50%,-50%) scale(1.8); opacity:.5; }
+  }
+
+  .coord-label {
+    position: absolute;
+    font-size: 0.65rem;
+    color: #888;
+    transform: translate(-50%, 8px);
+    white-space: nowrap;
+  }
+
+  /* ── PATH LINE ── */
+  .path-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    transform-origin: left center;
+    opacity: 0.3;
+  }
+
+  /* ── MAN ── */
+  #man {
+    position: absolute;
+    width: 32px;
+    height: 60px;
+    transform: translate(-50%, -100%);
+    transition: none;
+  }
+
+  /* SVG pixel-art man parts */
+  #man svg { width: 100%; height: 100%; }
+
+  /* ── WALK ANIMATION ── */
+  #man.walking .leg-left  { animation: walkL 0.35s infinite alternate; transform-origin: 50% 0; }
+  #man.walking .leg-right { animation: walkR 0.35s infinite alternate; transform-origin: 50% 0; }
+  #man.walking .arm-left  { animation: walkR 0.35s infinite alternate; transform-origin: 50% 0; }
+  #man.walking .arm-right { animation: walkL 0.35s infinite alternate; transform-origin: 50% 0; }
+  #man.walking .body-group { animation: bob 0.35s infinite alternate; transform-origin: 50% 50%; }
+
+  @keyframes walkL {
+    from { transform: rotate(-25deg); }
+    to   { transform: rotate(25deg); }
+  }
+  @keyframes walkR {
+    from { transform: rotate(25deg); }
+    to   { transform: rotate(-25deg); }
+  }
+  @keyframes bob {
+    from { transform: translateY(0); }
+    to   { transform: translateY(2px); }
+  }
+
+  /* ── SIDE PANEL ── */
+  .panel {
+    width: 300px;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .panel-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-section h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .coords-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .coord-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .coord-input-group label {
+    font-size: 0.65rem;
+    color: #666;
+  }
+
+  .coord-input-group input {
+    background: #0a0a0f;
+    border: 1px solid #333;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    padding: 6px 8px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .coord-input-group input:focus { border-color: var(--accent); }
+
+  .btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+
+  .btn:hover { background: var(--accent); color: #000; }
+  .btn:disabled { border-color: #333; color: #333; cursor: default; }
+  .btn:disabled:hover { background: transparent; color: #333; }
+
+  /* ── OOP CODE PANEL ── */
+  .code-block {
+    background: #070710;
+    border: 1px solid var(--border);
+    padding: 12px;
+    font-size: 0.7rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .kw  { color: #c678dd; }
+  .cls { color: #e5c07b; }
+  .fn  { color: #61afef; }
+  .str { color: #98c379; }
+  .cm  { color: #5c6370; font-style: italic; }
+  .val { color: var(--accent2); }
+
+  /* ── LOG ── */
+  .log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .log-entry {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-left: 2px solid #333;
+    color: #666;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .log-entry.info  { border-color: var(--accent);  color: var(--text); }
+  .log-entry.move  { border-color: var(--accent2); color: var(--accent2); }
+  .log-entry.ok    { border-color: #98c379;         color: #98c379; }
+  .log-entry.warn  { border-color: #e5c07b;         color: #e5c07b; }
+
+  @keyframes fadeIn { from { opacity:0; transform: translateX(-6px); } to { opacity:1; transform:none; } }
+
+  /* ── OOP BADGE ── */
+  .oop-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 0.6rem;
+    border: 1px solid;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+  .oop-badge.marcher { border-color: var(--accent2); color: var(--accent2); }
+  .oop-badge.methode { border-color: var(--accent); color: var(--accent); }
+
+  .man-shadow {
+    position: absolute;
+    width: 20px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0.2;
+    transform: translate(-50%, 0);
+    filter: blur(4px);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>OOP · DÉPLACEMENT D'OBJET</h1>
+  <div class="status-bar">
+    marcher() = <span id="hdr-marcher">false</span>
+    &nbsp;|&nbsp;
+    pos = <span id="hdr-pos">(0, 0)</span>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- ══ GAME AREA ══ -->
+  <div class="game-area" id="gameArea">
+    <div class="ground"></div>
+    <div id="man">
+      <svg viewBox="0 0 32 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g class="body-group">
+          <!-- Head -->
+          <circle cx="16" cy="7" r="6" fill="#00ffe7" opacity="0.9"/>
+          <!-- Eyes -->
+          <circle cx="14" cy="6.5" r="1" fill="#0a0a0f"/>
+          <circle cx="18" cy="6.5" r="1" fill="#0a0a0f"/>
+          <!-- Body -->
+          <rect x="10" y="13" width="12" height="18" rx="2" fill="#00ffe7" opacity="0.7"/>
+          <!-- Arms -->
+          <rect class="arm-left"  x="3"  y="13" width="7"  height="3" rx="1.5" fill="#00ffe7" opacity="0.6"/>
+          <rect class="arm-right" x="22" y="13" width="7"  height="3" rx="1.5" fill="#00ffe7" opacity="0.6"/>
+          <!-- Legs -->
+          <rect class="leg-left"  x="10" y="31" width="5"  height="18" rx="2" fill="#00ffe7" opacity="0.8"/>
+          <rect class="leg-right" x="17" y="31" width="5"  height="18" rx="2" fill="#00ffe7" opacity="0.8"/>
+        </g>
+      </svg>
+    </div>
+    <div class="man-shadow" id="manShadow"></div>
+  </div>
+
+  <!-- ══ SIDE PANEL ══ -->
+  <div class="panel">
+
+    <!-- Code OOP -->
+    <div class="panel-section">
+      <h2>MODÉLISATION OOP</h2>
+      <div class="code-block"><span class="cm"># Ta modélisation ✓ améliorée</span>
+<span class="kw">class</span> <span class="cls">AnimationMarcheur</span>:
+  <span class="kw">def</span> <span class="fn">jouer</span>(<span class="kw">self</span>):
+    <span class="cm">"""affiche l'animation"""</span>
+    ...
+
+<span class="kw">class</span> <span class="cls">Homme</span>:
+  <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, x, y):
+    <span class="kw">self</span>.pos = (x, y)
+    <span class="kw">self</span>._marche = <span class="val">False</span>
+    <span class="kw">self</span>.anim = <span class="cls">AnimationMarcheur</span>()
+
+  <span class="kw">def</span> <span class="fn">marcher</span>(<span class="kw">self</span>, cx, cy):
+    <span class="kw">self</span>._marche = <span class="val">True</span>
+    <span class="kw">self</span>.anim.<span class="fn">jouer</span>()   <span class="cm"># ← délégation</span>
+    <span class="kw">self</span>.pos = (cx, cy)
+    <span class="kw">self</span>._marche = <span class="val">False</span>
+    <span class="kw">return</span> <span class="val">True</span></div>
+    </div>
+
+    <!-- Contrôles -->
+    <div class="panel-section">
+      <h2>CONTRÔLE · DÉPLACEMENT</h2>
+      <div class="coords-grid">
+        <div class="coord-input-group">
+          <label>cible X (c)</label>
+          <input type="number" id="destX" value="5" min="0" max="20">
+        </div>
+        <div class="coord-input-group">
+          <label>cible Y (d)</label>
+          <input type="number" id="destY" value="0" min="0" max="10">
+        </div>
+      </div>
+      <button class="btn" id="btnMarcher" onclick="demarrer()">▶ homme.marcher(c, d)</button>
+      <button class="btn" id="btnReset" onclick="reset()" style="margin-top:6px; border-color:#333; color:#666;">↺ RESET</button>
+    </div>
+
+    <!-- Log -->
+    <div class="panel-section" style="border-bottom:none; flex:1; display:flex; flex-direction:column; overflow:hidden; padding-bottom:0;">
+      <h2>CONSOLE · LOG</h2>
+      <div class="log" id="log"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  MODÉLISATION OOP EN JS — miroir du code Python
+// ══════════════════════════════════════════════════════
+
+class AnimationMarcheur {
+  constructor(manEl) {
+    this.manEl = manEl;
+    this._active = false;
+  }
+
+  jouer() {
+    this._active = true;
+    this.manEl.classList.add('walking');
+  }
+
+  arreter() {
+    this._active = false;
+    this.manEl.classList.remove('walking');
+  }
+
+  get estActive() { return this._active; }
+}
+
+class Homme {
+  constructor(x, y) {
+    this.pos = { x, y };
+    this._marche = false;
+
+    // Composition : Homme possède une AnimationMarcheur
+    this.anim = new AnimationMarcheur(document.getElementById('man'));
+  }
+
+  // marcher(c, d) déplace l'homme de pos actuelle vers (c, d)
+  // retourne true quand terminé
+  marcher(cx, cy, onStep, onDone) {
+    if (this._marche) return false;   // déjà en déplacement
+
+    this._marche = true;
+    this.anim.jouer();
+    updateHeader();
+    log(`<span class="oop-badge marcher">marcher()</span> appelé → (${cx}, ${cy})`, 'info');
+    log(`Départ : (${this.pos.x}, ${this.pos.y})`, 'move');
+
+    const startX = this.pos.x;
+    const startY = this.pos.y;
+    const steps = 60;
+    let step = 0;
+
+    const tick = () => {
+      step++;
+      const t = step / steps;
+      this.pos.x = +(startX + (cx - startX) * t).toFixed(2);
+      this.pos.y = +(startY + (cy - startY) * t).toFixed(2);
+      onStep(this.pos.x, this.pos.y);
+      updateHeader();
+
+      if (step < steps) {
+        requestAnimationFrame(tick);
+      } else {
+        this.pos = { x: cx, y: cy };
+        this._marche = false;
+        this.anim.arreter();
+        updateHeader();
+        log(`Arrivée : (${this.pos.x}, ${this.pos.y})`, 'ok');
+        log(`<span class="oop-badge methode">marcher()</span> → <b>true</b>`, 'ok');
+        onDone();
+      }
+    };
+
+    requestAnimationFrame(tick);
+    return true;
+  }
+
+  get marche() { return this._marche; }
+}
+
+// ══════════════════════════════════════════════════════
+//  MONDE : coordonnées logiques → pixels
+// ══════════════════════════════════════════════════════
+
+const GRID_W = 21; // 0..20
+const manEl      = document.getElementById('man');
+const shadowEl   = document.getElementById('manShadow');
+const gameArea   = document.getElementById('gameArea');
+const btnMarcher = document.getElementById('btnMarcher');
+
+let homme = new Homme(0, 0);
+let startDot, endDot, pathLine;
+
+function logicalToPixel(lx, ly) {
+  const area = gameArea.getBoundingClientRect();
+  const padH = 60;
+  const groundY = area.height - 62; // ground line
+  const px = padH + (lx / 20) * (area.width - padH * 2);
+  const py = groundY - ly * 18;     // chaque unité Y = 18px vers le haut
+  return { px, py };
+}
+
+function placeMan(lx, ly) {
+  const { px, py } = logicalToPixel(lx, ly);
+  manEl.style.left = px + 'px';
+  manEl.style.top  = py + 'px';
+  shadowEl.style.left = px + 'px';
+  shadowEl.style.top  = (py + 2) + 'px';
+}
+
+function placeDot(el, lx, ly) {
+  const { px, py } = logicalToPixel(lx, ly);
+  el.style.left = px + 'px';
+  el.style.top  = py + 'px';
+}
+
+function drawPath(lx1, ly1, lx2, ly2) {
+  if (pathLine) pathLine.remove();
+  const p1 = logicalToPixel(lx1, ly1);
+  const p2 = logicalToPixel(lx2, ly2);
+  const dx = p2.px - p1.px, dy = p2.py - p1.py;
+  const len = Math.sqrt(dx*dx + dy*dy);
+  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+  pathLine = document.createElement('div');
+  pathLine.className = 'path-line';
+  pathLine.style.left   = p1.px + 'px';
+  pathLine.style.top    = p1.py + 'px';
+  pathLine.style.width  = len + 'px';
+  pathLine.style.transform = `rotate(${angle}deg)`;
+  gameArea.appendChild(pathLine);
+}
+
+// ══════════════════════════════════════════════════════
+//  UI LOGIC
+// ══════════════════════════════════════════════════════
+
+function log(msg, type='') {
+  const logEl = document.getElementById('log');
+  const div = document.createElement('div');
+  div.className = 'log-entry ' + type;
+  div.innerHTML = '&gt; ' + msg;
+  logEl.appendChild(div);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function updateHeader() {
+  document.getElementById('hdr-marcher').textContent = homme.marche ? 'true' : 'false';
+  document.getElementById('hdr-pos').textContent = `(${homme.pos.x}, ${homme.pos.y})`;
+}
+
+function demarrer() {
+  const cx = parseInt(document.getElementById('destX').value) || 0;
+  const cy = parseInt(document.getElementById('destY').value) || 0;
+
+  if (cx < 0 || cx > 20 || cy < 0 || cy > 10) {
+    log('Coordonnées hors limites ! (x:0-20, y:0-10)', 'warn');
+    return;
+  }
+
+  if (homme.marche) { log('Déjà en déplacement !', 'warn'); return; }
+
+  btnMarcher.disabled = true;
+
+  // Marqueurs
+  if (startDot) startDot.remove();
+  if (endDot)   endDot.remove();
+
+  startDot = document.createElement('div');
+  startDot.className = 'coord-dot start';
+  startDot.innerHTML = `<div class="coord-label">(${homme.pos.x},${homme.pos.y})</div>`;
+  gameArea.appendChild(startDot);
+  placeDot(startDot, homme.pos.x, homme.pos.y);
+
+  endDot = document.createElement('div');
+  endDot.className = 'coord-dot end';
+  endDot.innerHTML = `<div class="coord-label">(${cx},${cy})</div>`;
+  gameArea.appendChild(endDot);
+  placeDot(endDot, cx, cy);
+
+  drawPath(homme.pos.x, homme.pos.y, cx, cy);
+
+  homme.marcher(cx, cy,
+    (x, y) => placeMan(x, y),
+    ()     => { btnMarcher.disabled = false; }
+  );
+}
+
+function reset() {
+  if (homme.marche) return;
+  homme = new Homme(0, 0);
+  placeMan(0, 0);
+  updateHeader();
+  if (startDot) { startDot.remove(); startDot = null; }
+  if (endDot)   { endDot.remove();   endDot = null; }
+  if (pathLine) { pathLine.remove(); pathLine = null; }
+  document.getElementById('log').innerHTML = '';
+  log('Nouvel objet Homme créé → pos(0,0)', 'info');
+}
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  placeMan(homme.pos.x, homme.pos.y);
+  updateHeader();
+  log('Classe <b>Homme</b> instanciée → pos(0, 0)', 'info');
+  log('Classe <b>AnimationMarcheur</b> composée', 'info');
+  log('En attente de homme.marcher(c, d)...', '');
+});
+</script>
+</body>
+</html>
