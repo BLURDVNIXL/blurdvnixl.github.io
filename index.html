@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les arcanes de la création — Guide de lecture accélérée</title>
+<style>
+:root{
+  --paper:#F6F3EC;
+  --paper-2:#EFEADD;
+  --ink:#211E19;
+  --ink-soft:#5B564C;
+  --ink-faint:#918C7E;
+  --line:#DAD3C2;
+  --line-strong:#C2B9A2;
+  --gold:#B08D57;
+  --gold-bg:#F1E7D3;
+  --burgundy:#7A2E2E;
+  --burgundy-bg:#F3E3E1;
+  --sage:#5F7161;
+  --sage-bg:#E7EDE4;
+  --blue:#3B5B72;
+  --blue-bg:#E4EBEF;
+  --radius:6px;
+  --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--serif);
+  font-size:16px;
+  line-height:1.6;
+  min-height:100vh;
+}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:600;margin:0 0 .5em;color:var(--ink);}
+h1{font-size:1.7rem;}
+h2{font-size:1.35rem;border-bottom:1px solid var(--line);padding-bottom:.4rem;}
+h3{font-size:1.1rem;color:var(--burgundy);}
+p{margin:0 0 .8em;}
+a{color:var(--blue);}
+button{font-family:var(--sans);cursor:pointer;}
+.chain{display:flex;align-items:center;gap:6px;opacity:.55;margin:.2rem 0 1rem;}
+.chain .ring{width:9px;height:9px;border:2px solid var(--gold);border-radius:50%;background:transparent;}
+.chain .bar{flex:1;height:1px;background:var(--line-strong);}
+
+/* layout */
+#app{display:flex;min-height:100vh;}
+#sidebar{
+  width:260px;flex-shrink:0;background:var(--paper-2);
+  border-right:1px solid var(--line);padding:1.2rem 1rem;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+#sidebar .brand{font-family:var(--serif);font-weight:600;font-size:1.05rem;margin-bottom:.15rem;}
+#sidebar .brand-sub{font-size:.78rem;color:var(--ink-faint);margin-bottom:1.1rem;font-family:var(--sans);}
+.nav-group{margin-bottom:.9rem;}
+.nav-group-label{font-family:var(--sans);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 .3rem .4rem;}
+.nav-btn{
+  display:block;width:100%;text-align:left;background:none;border:none;
+  font-family:var(--sans);font-size:.92rem;color:var(--ink-soft);
+  padding:.4rem .5rem;border-radius:var(--radius);margin-bottom:1px;
+}
+.nav-btn:hover{background:var(--line);color:var(--ink);}
+.nav-btn.active{background:var(--burgundy);color:#fff;}
+.nav-sub{padding-left:.9rem;}
+.nav-sub .nav-btn{font-size:.85rem;}
+
+#menu-toggle{display:none;}
+
+#main{flex:1;min-width:0;padding:2.2rem 3rem 5rem;max-width:920px;}
+.progress-global{
+  background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:.7rem 1rem;margin-bottom:1.6rem;font-family:var(--sans);font-size:.85rem;
+  display:flex;align-items:center;gap:.9rem;
+}
+.progress-global .bar-track{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden;}
+.progress-global .bar-fill{height:100%;background:var(--gold);}
+
+/* search */
+#search-wrap{position:relative;margin-bottom:1.6rem;}
+#search-input{
+  width:100%;padding:.55rem .9rem .55rem 2.2rem;border:1px solid var(--line-strong);
+  border-radius:var(--radius);background:#fff;font-family:var(--sans);font-size:.92rem;
+}
+#search-wrap::before{content:"⌕";position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--ink-faint);font-size:1.1rem;}
+#search-results{margin-top:.6rem;}
+.search-hit{padding:.5rem .7rem;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:.4rem;background:#fff;font-family:var(--sans);font-size:.85rem;cursor:pointer;}
+.search-hit b{font-family:var(--serif);}
+.search-hit:hover{border-color:var(--gold);}
+
+/* filter pills */
+.filters{display:flex;gap:.5rem;margin-bottom:1.4rem;flex-wrap:wrap;font-family:var(--sans);}
+.filter-pill{
+  border:1px solid var(--line-strong);background:#fff;padding:.35rem .8rem;border-radius:20px;
+  font-size:.82rem;color:var(--ink-soft);
+}
+.filter-pill.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.mode-toggle{display:flex;gap:.5rem;margin-bottom:1.4rem;font-family:var(--sans);flex-wrap:wrap;}
+.mode-btn{border:1px solid var(--line-strong);background:#fff;padding:.4rem .9rem;border-radius:var(--radius);font-size:.82rem;}
+.mode-btn.active{background:var(--sage);color:#fff;border-color:var(--sage);}
+
+/* home hero */
+.hero{margin-bottom:2rem;}
+.hero p.lead{font-size:1.05rem;color:var(--ink-soft);max-width:640px;}
+.parcours-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.5rem 0 2rem;}
+.parcours-card{
+  border:1px solid var(--line-strong);border-radius:10px;padding:1.1rem 1.2rem;background:#fff;
+  cursor:pointer;transition:border-color .15s;
+}
+.parcours-card:hover{border-color:var(--gold);}
+.parcours-card .emoji{font-size:1.4rem;}
+.parcours-card h3{margin:.4rem 0 .3rem;color:var(--ink);}
+.parcours-card p{font-family:var(--sans);font-size:.85rem;color:var(--ink-soft);margin:0;}
+
+.work-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:2rem;}
+.work-card{border:1px solid var(--line-strong);border-radius:10px;padding:1rem 1.1rem;background:#fff;cursor:pointer;}
+.work-card:hover{border-color:var(--gold);}
+.work-card .tag{font-family:var(--sans);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);}
+.work-card .bar-track{height:6px;background:var(--line);border-radius:3px;margin-top:.6rem;overflow:hidden;}
+.work-card .bar-fill{height:100%;background:var(--sage);}
+
+/* passage card */
+.passage{
+  border:1px solid var(--line-strong);border-radius:10px;background:#fff;
+  margin-bottom:1.1rem;overflow:hidden;
+}
+.passage.p3{border-left:5px solid var(--burgundy);}
+.passage.p2{border-left:5px solid var(--gold);}
+.passage.p1{border-left:5px solid var(--sage);}
+.passage-head{padding:.9rem 1.1rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;}
+.passage-head .stars{font-family:var(--sans);font-size:.75rem;color:var(--ink-faint);letter-spacing:.03em;}
+.passage-head h3{margin:.15rem 0 0;}
+.passage-loc{font-family:var(--sans);font-size:.78rem;color:var(--ink-faint);}
+.passage-body{padding:0 1.1rem 1rem;}
+.sect{margin-bottom:.7rem;}
+.sect-label{font-family:var(--sans);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:.15rem;}
+.sect p{margin:0;font-size:.95rem;}
+.tag-flag{
+  display:inline-block;font-family:var(--sans);font-size:.68rem;background:var(--paper-2);
+  border:1px solid var(--line);border-radius:3px;padding:1px 5px;margin-left:5px;color:var(--ink-faint);
+}
+.passage-actions{display:flex;gap:.7rem;padding:.7rem 1.1rem;border-top:1px solid var(--line);font-family:var(--sans);font-size:.82rem;}
+.chk{display:flex;align-items:center;gap:.35rem;cursor:pointer;color:var(--ink-soft);}
+.chk input{accent-color:var(--sage);}
+.bm-btn{border:none;background:none;color:var(--ink-faint);font-family:var(--sans);font-size:.82rem;cursor:pointer;}
+.bm-btn.active{color:var(--burgundy);font-weight:600;}
+
+blockquote.quote{
+  border-left:3px solid var(--gold);margin:0 0 1rem;padding:.4rem 0 .4rem 1rem;
+  font-style:italic;color:var(--ink-soft);
+}
+
+/* table */
+table.cmp{width:100%;border-collapse:collapse;font-size:.88rem;margin-bottom:1.5rem;}
+table.cmp th,table.cmp td{border:1px solid var(--line);padding:.5rem .6rem;text-align:left;vertical-align:top;}
+table.cmp th{background:var(--paper-2);font-family:var(--sans);font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;}
+table.cmp td:first-child{font-weight:600;background:var(--paper-2);font-size:.82rem;}
+
+/* argument card */
+.arg-card{border:1px solid var(--line-strong);border-radius:10px;background:#fff;padding:1rem 1.2rem;margin-bottom:1rem;}
+.arg-flow{font-family:var(--sans);font-size:.8rem;color:var(--ink-faint);margin:.5rem 0;}
+
+/* citation card */
+.cit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;}
+.cit-card{border:1px solid var(--line-strong);border-radius:10px;background:#fff;padding:1rem 1.1rem;}
+.cit-card .who{font-family:var(--sans);font-size:.75rem;color:var(--ink-faint);margin-top:.5rem;}
+
+/* fiche */
+.fiche-box{border:1px solid var(--line-strong);border-radius:10px;background:#fff;padding:1.1rem 1.3rem;margin-bottom:1.2rem;}
+.fiche-box h3{margin-top:0;}
+.fiche-box ul{margin:0;padding-left:1.1rem;}
+.fiche-box li{margin-bottom:.3rem;}
+
+/* quiz */
+.quiz-q{border:1px solid var(--line-strong);border-radius:10px;background:#fff;padding:1.1rem 1.2rem;margin-bottom:1rem;}
+.quiz-q .qtag{font-family:var(--sans);font-size:.7rem;text-transform:uppercase;color:var(--gold);letter-spacing:.05em;}
+.reveal-btn{background:var(--ink);color:#fff;border:none;border-radius:var(--radius);padding:.4rem .9rem;font-family:var(--sans);font-size:.82rem;margin-top:.5rem;}
+.answer{display:none;margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--line-strong);font-size:.92rem;}
+.answer.shown{display:block;}
+
+/* flashcards */
+.fc-wrap{max-width:480px;margin:0 auto;}
+.fc{
+  border:1px solid var(--line-strong);border-radius:12px;background:#fff;min-height:200px;
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:1.6rem;
+  cursor:pointer;font-size:1.05rem;position:relative;
+}
+.fc .side-label{position:absolute;font-family:var(--sans);font-size:.68rem;color:var(--ink-faint);top:.6rem;left:.8rem;text-transform:uppercase;}
+.fc-outer{position:relative;}
+.fc-nav{display:flex;justify-content:space-between;margin-top:1rem;font-family:var(--sans);}
+.fc-nav button{border:1px solid var(--line-strong);background:#fff;border-radius:var(--radius);padding:.5rem 1rem;}
+.fc-counter{font-family:var(--sans);font-size:.82rem;color:var(--ink-faint);text-align:center;margin-top:.5rem;}
+.fc-judge{display:flex;gap:.6rem;justify-content:center;margin-top:.9rem;}
+.fc-judge button{border-radius:20px;padding:.4rem 1rem;font-family:var(--sans);font-size:.85rem;border:1px solid var(--line-strong);background:#fff;}
+
+.hint-box{background:var(--sage-bg);border:1px solid var(--sage);border-radius:var(--radius);padding:.7rem 1rem;font-family:var(--sans);font-size:.85rem;margin-bottom:1.4rem;color:#33402f;}
+.empty{font-family:var(--sans);color:var(--ink-faint);font-style:italic;padding:1rem;}
+
+/* print */
+@media print{
+  #sidebar,#search-wrap,.filters,.mode-toggle,.progress-global,.passage-actions,#menu-toggle,.no-print{display:none !important;}
+  #app{display:block;}
+  #main{max-width:100%;padding:0;}
+  .passage{break-inside:avoid;border:1px solid #888;}
+  body{background:#fff;}
+}
+
+@media (max-width:820px){
+  #sidebar{position:fixed;left:-280px;top:0;z-index:50;width:250px;transition:left .2s;box-shadow:2px 0 10px rgba(0,0,0,.15);}
+  #sidebar.open{left:0;}
+  #menu-toggle{
+    display:block;position:fixed;top:.8rem;left:.8rem;z-index:60;background:var(--ink);color:#fff;
+    border:none;border-radius:var(--radius);padding:.5rem .7rem;font-size:1rem;
+  }
+  #main{padding:4rem 1.1rem 4rem;}
+  #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;}
+  #overlay.show{display:block;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <button id="menu-toggle" aria-label="Ouvrir le menu">☰</button>
+  <div id="overlay"></div>
+  <nav id="sidebar">
+    <div class="brand">Les arcanes de la création</div>
+    <div class="brand-sub">Guide de lecture accélérée — CPGE</div>
+    <div class="nav-group">
+      <button class="nav-btn" data-page="accueil">Accueil</button>
+      <button class="nav-btn" data-page="theme">Le thème en 10 min</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Platon</div>
+      <button class="nav-btn nav-sub" data-page="platon">Ion</button>
+      <button class="nav-btn nav-sub" data-page="republique">La République (Livre X)</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Zola</div>
+      <button class="nav-btn nav-sub" data-page="zola">L'Œuvre</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Woolf</div>
+      <button class="nav-btn nav-sub" data-page="woolf">Un lieu à soi</button>
+    </div>
+    <div class="nav-group">
+      <button class="nav-btn" data-page="comparaison">Comparaison</button>
+      <button class="nav-btn" data-page="dissertation">Dissertation</button>
+      <button class="nav-btn" data-page="citations">Citations</button>
+      <button class="nav-btn" data-page="fiche20">Fiche 20%</button>
+    </div>
+    <div class="nav-group">
+      <button class="nav-btn" data-page="quiz">Quiz</button>
+      <button class="nav-btn" data-page="flashcards">Flashcards</button>
+      <button class="nav-btn" data-page="revisions">Mes révisions</button>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div class="progress-global">
+      <span id="progress-label">0 / 0 passages étudiés</span>
+      <div class="bar-track"><div class="bar-fill" id="progress-fill" style="width:0%"></div></div>
+      <span id="progress-pct">0%</span>
+      <button class="no-print" onclick="window.print()" style="margin-left:auto;border:1px solid var(--line-strong);background:#fff;border-radius:var(--radius);padding:.3rem .7rem;font-family:var(--sans);font-size:.78rem;">Imprimer / PDF</button>
+    </div>
+
+    <div id="search-wrap">
+      <input id="search-input" type="text" placeholder="Rechercher un concept, un personnage, une citation…">
+      <div id="search-results"></div>
+    </div>
+
+    <div id="content"></div>
+  </main>
+</div>
+
+<script>
+/* =========================================================
+   DONNÉES — tout le contenu vérifié des Parties 1 à 4 du guide
+   ========================================================= */
+
+const PASSAGES = [
+{id:"ion-pierre",work:"platon",star:3,title:"La pierre magnétique",loc:"Ion, 533d-534e",
+ contexte:"Socrate vient de démontrer qu'Ion n'a pas d'art (technè) sur Homère ; il propose maintenant sa propre explication.",
+ fait:"Socrate compare l'inspiration poétique à un aimant (pierre d'Héraclée) transmettant sa force à une chaîne d'anneaux de fer : Muse → poète → rapsode → spectateur.",
+ explication:"Le discours du poète n'est ni un savoir ni un jugement rationnel : c'est une force qui traverse une chaîne d'intermédiaires, sans qu'aucun d'eux n'en soit propriétaire. Socrate ajoute : si un poète avait un art, il exceilerait dans tous les genres poétiques ; or chacun n'excelle que dans un seul genre.",
+ retenir:"Platon ne nie pas la puissance de la poésie — il nie qu'elle relève d'un savoir.",
+ theme:"Texte fondateur de l'opposition inspiration ↔ technè dans toute réflexion occidentale sur la création.",
+ liens:"↔ Zola : dépossession heureuse et divine chez Ion vs dépossession douloureuse et auto-destructrice chez Claude (fin ch. II). ↔ Woolf : rapprochement artificiel à éviter — Woolf ne traite jamais l'inspiration comme force extérieure.",
+ quote:"« le poète est chose ailée, légère, et sainte » [534b]"},
+
+{id:"ion-dilemme",work:"platon",star:3,title:"Le dilemme final",loc:"Ion, 541e-542b",
+ contexte:"Ion, acculé, a fini par prétendre connaître l'art du général par la seule vertu d'Homère — contradiction manifeste.",
+ fait:"Socrate propose à Ion un choix : soit il ment en cachant un art réel, soit il parle sans savoir, par pure inspiration divine.",
+ explication:"« Veux-tu être considéré par nous comme un tricheur ou comme un homme divin ? » Ion répond qu'il est plus beau de passer pour un homme divin.",
+ retenir:"Dans les deux branches du dilemme, Ion perd toute autorité cognitive — le choix n'est flatteur qu'en apparence.",
+ theme:"Clé de lecture essentielle : Platon ne tranche pas franchement en faveur de l'inspiration, il piège son interlocuteur.",
+ liens:"↔ Woolf : Woolf refuse explicitement de conclure (chap. I) — contraste net avec ce dilemme rhétorique fermé. Deux manières opposées de finir une réflexion sur la création.",
+ quote:"« Veux-tu être considéré par nous comme un tricheur ou comme un homme divin ? » [542a-b]"},
+
+{id:"rep-lits",work:"republique",star:3,title:"Les trois lits",loc:"La République X, 596a-598c",
+ contexte:"Socrate vient d'annoncer qu'il faut examiner ce qu'est l'imitation « en général », en partant de la théorie des Formes.",
+ fait:"Socrate distingue trois lits : celui que le dieu a produit par nature (la Forme du Lit, unique), celui que le menuisier fabrique en la regardant, et celui que le peintre peint en imitant celui du menuisier.",
+ explication:"Le peintre est donc « troisième » à partir de la réalité. La peinture n'imite même pas la Forme ni l'objet réel, mais seulement l'apparence de l'objet fabriqué : « la peinture est-elle une imitation de l'apparence ou de la vérité ? — De l'apparence. »",
+ retenir:"La peinture (et par extension la poésie) est à trois degrés de la vérité — Forme → objet fabriqué → image de l'objet.",
+ theme:"Texte fondateur de la dévalorisation métaphysique de l'art mimétique — créer une image, c'est s'éloigner du réel, pas s'en approcher.",
+ liens:"↔ Ion : durcit la position de l'Ion — le poète y était déjà privé de savoir technique, ici il est en plus placé à distance métaphysique de la vérité. ↔ Zola : tension féconde — la toile de l'enfant mort (fin ch. IX) est jugée supérieure parce qu'elle est vraie, position presque inverse de celle de Platon. ↔ Woolf : aucun équivalent, Woolf ne pose jamais la question en termes de degrés métaphysiques de vérité.",
+ quote:"« il est l'imitateur de cet objet, dont eux sont les artisans » [597e]"},
+
+{id:"rep-triade",work:"republique",star:3,title:"La triade usager / fabricant / imitateur",loc:"La République X, 601c-602b",
+ contexte:"Après l'exemple de la bride et du mors (dessinés par le peintre, fabriqués par le forgeron, mais jugés seulement par le cavalier qui les utilise), Socrate généralise.",
+ fait:"Pour chaque objet existent trois arts : l'art de s'en servir (l'usager, qui a le savoir), l'art de le fabriquer (le fabricant, opinion correcte), et l'art de l'imiter (l'imitateur, ni l'un ni l'autre).",
+ explication:"Socrate conclut : « l'imitateur ne possédera pas de savoir et il n'aura pas d'opinion correcte relativement aux objets qu'il imite. » Le poète-imitateur ne consulte jamais celui qui sait ; il imite ce qui semble beau au grand nombre et à ceux qui ne savent pas.",
+ retenir:"L'imitateur est le seul des trois artisans à ne détenir ni savoir ni même une opinion droite.",
+ theme:"Radicalise la question « le discours sur l'art vaut-il savoir ? » déjà posée dans l'Ion, en la formalisant dans un système à trois termes.",
+ liens:"↔ Ion : généralise à Homère lui-même l'intuition déjà présente dans l'Ion (le rapsode ne sait pas juger si Homère dit vrai sur un métier). ↔ Zola : Bongrand et Sandoz parlent de peinture avec une autorité que Platon refuserait à un simple imitateur — Zola légitime la parole des artistes sur leur art, à l'inverse de Platon.",
+ quote:"« l'imitateur ne possédera pas de savoir et il n'aura pas d'opinion correcte relativement aux objets qu'il imite » [602a-b]"},
+
+{id:"rep-ame",work:"republique",star:3,title:"L'effet de la poésie sur l'âme",loc:"La République X, 603c-606d",
+ contexte:"Socrate se demande si l'art imitatif poétique, comme l'art pictural, s'adresse à une partie médiocre de l'âme.",
+ fait:"Face au deuil, l'homme de valeur lutte pour garder son calme en public mais se laisse aller à la plainte dans l'intimité — preuve d'un conflit entre partie rationnelle et partie irrationnelle de l'âme. La poésie imitative s'adresse à cette seconde partie, la nourrit et l'affermit.",
+ explication:"Au théâtre, nous prenons plaisir à voir un héros se lamenter — plaisir qu'on ne s'autoriserait jamais pour soi-même. Mais il n'est guère facile de retenir, dans son propre chagrin, une compassion nourrie dans celui des autres. Même argument étendu au comique et à l'amour/au désir.",
+ retenir:"La poésie imitative ne se contente pas de représenter les passions — elle les entraîne et les renforce chez le spectateur, y compris « les gens de valeur ».",
+ theme:"Argument psychologique majeur : la création peut agir directement, et dangereusement, sur l'équilibre intérieur de celui qui la reçoit.",
+ liens:"↔ Zola : rapprochement très fort — Bongrand donnerait « dix ans de sa vie » pour avoir peint la toile de Claude (ch. V), exactement le type d'emprise que Platon redoute. Plus frappant : la scène où Claude peint son enfant mort illustre presque littéralement le danger platonicien — la douleur réelle nourrit et est nourrie par l'acte de représentation. ↔ Ion : les larmes et la peur d'Ion en déclamant [535c-e] sont exactement le phénomène que Platon condamne ici — ce que l'Ion décrivait avec bienveillance devient un danger moral dans la République.",
+ quote:"« le médiocre s'accouplant au médiocre, l'art imitatif n'engendre que du médiocre » [603b]"},
+
+{id:"rep-conflit",work:"republique",star:2,title:"Le vieux conflit et la défense possible",loc:"La République X, 606e-608b",
+ contexte:"Conclusion du raisonnement sur la poésie, juste avant que le dialogue ne bifurque vers l'immortalité de l'âme (hors sujet pour ce guide).",
+ fait:"Socrate rappelle qu'« il est ancien le conflit entre la philosophie et l'art de la poésie ». Il n'exclut pas un retour de la poésie si ses défenseurs peuvent montrer qu'elle est utile et pas seulement agréable.",
+ explication:"Ce n'est pas un rejet dogmatique et définitif, mais un bannissement conditionnel — assorti d'un aveu : Socrate lui-même reste sensible au charme de la poésie, « surtout dans l'œuvre d'Homère ».",
+ retenir:"Platon ne nie jamais la puissance de l'art, il en craint la puissance incontrôlée et non justifiée rationnellement.",
+ theme:"Nuance importante : ce n'est pas un rejet fermé mais une suspension de jugement sous condition.",
+ liens:"↔ Woolf : rapprochement possible — Woolf, comme Socrate, refuse de trancher définitivement (chap. I) ; mais leurs raisons sont opposées — Woolf par prudence épistémologique, Socrate parce que la preuve d'utilité n'est jamais apportée.",
+ quote:"« il est ancien le conflit entre la philosophie et l'art de la poésie » [607b]"},
+
+{id:"rep-homere",work:"republique",star:2,title:"L'échec pédagogique d'Homère",loc:"La République X, 599c-600e",
+ contexte:"Avant de conclure sur les effets psychologiques, Socrate interroge le statut de « grand éducateur de la Grèce » souvent attribué à Homère.",
+ fait:"Socrate demande, sans obtenir de réponse positive : quelle cité Homère a-t-il réformée comme Lycurgue ou Solon ? Quelle guerre a-t-il menée ou conseillée ? A-t-il, comme Pythagore, laissé des disciples menant un mode de vie reconnaissable ?",
+ explication:"Platon ne conteste pas le génie poétique d'Homère — il conteste le transfert de ce génie vers un savoir pratique sur la vie, la guerre ou l'éducation.",
+ retenir:"Juger le savoir prétendu d'un poète à ses effets concrets et vérifiables, jamais à son seul prestige verbal.",
+ theme:"Prolongement direct de la méthode de l'Ion appliqué cette fois à Homère lui-même, pas seulement à ses interprètes.",
+ liens:"↔ Ion : exact prolongement de la méthode de l'Ion (juger par les effets vérifiables, pas par le prestige).",
+ quote:""},
+
+{id:"zola-destruction",work:"zola",star:3,title:"L'auto-destruction de la toile",loc:"L'Œuvre, fin chapitre II",
+ contexte:"Claude travaille depuis des heures sur la figure de femme de son grand tableau, avec Sandoz et Dubuche présents.",
+ fait:"Dans un accès de rage contre son propre travail, Claude prend un couteau à palette et gratte la tête et la gorge de la femme qu'il vient de peindre.",
+ explication:"Zola décrit ce geste dans un vocabulaire de meurtre : « un meurtre véritable, un écrasement : tout disparut dans une bouillie fangeuse ». Ce n'est pas un accident ni une critique extérieure : c'est le créateur lui-même qui détruit sa création.",
+ retenir:"Le premier grand acte destructeur du roman ne vient pas du jugement du public, mais de Claude lui-même.",
+ theme:"Passage central pour « création et souffrance » et « le créateur maîtrise-t-il son œuvre ? » — réponse : non, de façon violente et physique.",
+ liens:"↔ Platon : dépossession extatique et heureuse chez Ion, rageuse et destructrice chez Claude — deux formes opposées à ne jamais confondre. ↔ Woolf : Woolf ne traite jamais ce rapport corporel et violent à l'œuvre déjà produite.",
+ quote:"« Ce fut un meurtre véritable, un écrasement... une chair de rêve évaporée et morte » [fin ch. II]"},
+
+{id:"zola-bongrand",work:"zola",star:3,title:"Bongrand : « un métier du tonnerre de Dieu »",loc:"L'Œuvre, fin chapitre III",
+ contexte:"Après une semaine de crise et de doute, Claude marche toute la nuit dans Paris avec Bongrand, peintre déjà établi et reconnu.",
+ fait:"Bongrand confie à Claude que la peinture reste, pour lui aussi, un métier d'une difficulté extrême.",
+ explication:"« à chaque œuvre nouvelle, il débutait, c'était à se casser la tête contre les murs. » Ce discours vient d'un peintre qui a déjà réussi — ce qui lui donne une autorité particulière.",
+ retenir:"Le succès ne supprime pas la souffrance du métier, il la déplace seulement.",
+ theme:"Nuance essentielle contre l'idée d'un « génie facile » — Zola montre une continuité de la souffrance créatrice, quel que soit le niveau de réussite sociale.",
+ liens:"↔ Platon : contraste frontal avec la facilité heureuse du poète « inspiré ». Voir aussi la scène du Salon des Refusés (ch. V) où Bongrand, pourtant à l'Institut, ressent une « peur sourde d'une lente déchéance ».",
+ quote:"« cette sacrée peinture était un métier du tonnerre de Dieu » [fin ch. III]"},
+
+{id:"zola-enfant",work:"zola",star:3,title:"La mort de l'enfant transformée en tableau",loc:"L'Œuvre, fin chapitre IX",
+ contexte:"L'enfant du couple vient de mourir. Après l'enterrement, Sandoz ramène Claude du cimetière.",
+ fait:"Claude a peint pendant cinq heures le corps de son enfant mort. Sandoz, saisi, admire la toile et Claude décide de l'envoyer au Salon plutôt que son grand tableau inachevé.",
+ explication:"« un chef-d'œuvre de clarté et de puissance, avec une immense tristesse en plus. » Zola ne condamne ni n'approuve explicitement ce geste : il le met en scène sans trancher sur la légitimité de transformer la douleur intime en matériau esthétique.",
+ retenir:"C'est le passage le plus moralement ambigu du roman — la création n'est jamais présentée comme innocente.",
+ theme:"Passage le plus fort du corpus pour « création et vérité » et « création et souffrance » — la toile est jugée supérieure précisément parce qu'elle porte une douleur réelle.",
+ liens:"↔ Woolf : à manier avec prudence — l'idée que la souffrance nourrit une écriture plus vraie n'est pas absente chez Woolf non plus (femmes écrivaines frustrées, chap. IV). ↔ Platon : aucun équivalent, l'Ion ne traite jamais du rapport entre douleur intime et matière poétique.",
+ quote:"« un chef-d'œuvre de clarté et de puissance, avec une immense tristesse en plus » [fin ch. IX]"},
+
+{id:"zola-pont",work:"zola",star:3,title:"Le pont : « cette douceur de mourir »",loc:"L'Œuvre, fin chapitre XI",
+ contexte:"Claude a repris son grand tableau avec une résignation inquiétante ; les signes de sa déchéance s'accumulent (vertige à la fenêtre, fin ch. X).",
+ fait:"Immobile sur un pont surplombant la Cité, Claude regarde longuement dans la nuit, luttant contre l'attrait de la mort. Christine, qui l'a suivi en secret, doit courir pour rentrer avant lui.",
+ explication:"Sans jamais nommer le mot « suicide », Zola met en scène une idéation suicidaire d'une clarté totale, directement liée à l'échec créateur de Claude.",
+ retenir:"Sommet du motif « création et destruction » dans le roman, juste avant le dénouement funèbre du chapitre XII.",
+ theme:"À mobiliser pour toute problématique sur le prix humain de la création, ou l'idée que l'œuvre peut consumer entièrement celui qui la porte.",
+ liens:"↔ Woolf : parallèle fort avec Judith Shakespeare, qui se suicide faute d'avoir pu exercer son génie. Chez Zola la mort menace celui qui peut créer mais s'y détruit ; chez Woolf elle frappe celle qui ne peut pas créer faute de moyens. Excellent axe de dissertation. ↔ Platon : aucun équivalent.",
+ quote:"« cette douceur de mourir » [fin ch. XI]"},
+
+{id:"zola-salon",work:"zola",star:2,title:"Le Salon des Refusés vu par Bongrand",loc:"L'Œuvre, chapitre V",
+ contexte:"Claude et Sandoz visitent le Salon des Refusés, exposition créée en 1863 après que le mécontentement des peintres rejetés eut « troublé l'Empereur ».",
+ fait:"Ils croisent Bongrand, membre de l'Institut mais en marge de ses collègues, qui félicite chaleureusement Claude pour son tableau.",
+ explication:"« je donnerais dix ans de ma vie, pour avoir peint votre grande coquine de femme. » Le passage montre la dimension institutionnelle et collective de la reconnaissance, et son ambivalence : Bongrand, malgré son succès, est traversé d'une « peur sourde d'une lente déchéance ».",
+ retenir:"La reconnaissance vient d'abord d'un pair, pas d'une institution — et elle n'apaise jamais durablement l'angoisse créatrice.",
+ theme:"Utile pour « création et reconnaissance » et « création et société » — Zola ancre la fiction dans un vrai événement historique.",
+ liens:"↔ Woolf : contraste net — chez Woolf l'institution empêche l'accès à la création ; chez Zola elle juge après coup une œuvre déjà réalisée.",
+ quote:"« je donnerais dix ans de ma vie, pour avoir peint votre grande coquine de femme » [ch. V]"},
+
+{id:"zola-fagerolles",work:"zola",star:2,title:"Fagerolles et la logique de l'arrivisme",loc:"L'Œuvre, ouverture chapitre X",
+ contexte:"Claude vient de porter « l'Enfant mort » au Palais de l'Industrie.",
+ fait:"Il croise Fagerolles, peintre autrefois proche de son cercle, devenu candidat au jury du Salon, qui promet de faire accepter son envoi.",
+ explication:"Fagerolles incarne, en contrepoint de Claude, une autre manière de réussir dans le monde de l'art : par les réseaux plutôt que par l'intransigeance créatrice.",
+ retenir:"La réussite sociale dans l'art ne suit pas nécessairement la même logique que la réussite esthétique.",
+ theme:"Utile pour « qui peut créer / qui réussit à être reconnu ? »",
+ liens:"↔ Woolf : aucun personnage équivalent — Woolf ne traite pas des rivalités de carrière mais des barrières d'accès à la création elle-même.",
+ quote:""},
+
+{id:"woolf-these",work:"woolf",star:3,title:"La thèse centrale et le refus de conclure",loc:"Un lieu à soi, chapitre I",
+ contexte:"La narratrice a été invitée à parler « des femmes et de la fiction » ; elle explique comment elle a réfléchi à ce sujet.",
+ fait:"Elle annonce qu'elle ne pourra tirer aucune conclusion générale, mais seulement donner son opinion sur un point mineur.",
+ explication:"« une femme doit avoir de l'argent et un lieu à elle » pour écrire de la fiction. Elle refuse explicitement de conclure sur « la vraie nature de la femme et la vraie nature de la fiction ».",
+ retenir:"La thèse du livre entier tient dans cette phrase, énoncée dès les premières pages.",
+ theme:"Passage fondateur pour « conditions matérielles » et « qui peut créer ? »",
+ liens:"↔ Platon : contraste marqué — Socrate mène son dialogue à un dilemme fermé ; Woolf revendique l'absence de conclusion. ↔ Zola : la thèse matérialiste trouve un écho concret dans les contraintes économiques du roman (loyer du hangar, ch. IX).",
+ quote:"« une femme doit avoir de l'argent et un lieu à elle » [chap. I]"},
+
+{id:"woolf-judith",work:"woolf",star:3,title:"Judith Shakespeare",loc:"Un lieu à soi, chapitre III",
+ contexte:"La narratrice vient de lire, sous la plume d'un évêque, que « les femmes ne peuvent pas écrire les pièces de Shakespeare ».",
+ fait:"Elle imagine que Shakespeare a eu une sœur, Judith, aussi douée que lui. Lui va à l'école, part chercher fortune à Londres, devient dramaturge à succès ; elle reste à la maison, n'apprend rien, est battue pour avoir refusé un mariage arrangé, s'enfuit à 17 ans, se fait rire au nez par un directeur de théâtre, se retrouve enceinte de lui, et se suicide un soir d'hiver.",
+ explication:"Woolf précise elle-même qu'elle invente cette histoire (« Permettez-moi d'imaginer, puisque l'absence de faits est têtue... »). Une note de l'édition confirme qu'une Judith Shakespeare a réellement existé (1585-1662, fille du dramaturge) mais que Woolf emprunte seulement son nom pour un personnage entièrement fictif.",
+ retenir:"Le génie seul ne suffit pas : sans instruction, sans liberté de mouvement, sans accès aux mêmes réseaux que son frère, le même don s'éteint et meurt anonyme.",
+ theme:"Passage le plus mobilisable de tout Woolf : démonstration par la fiction que les conditions sociales précèdent et conditionnent le talent individuel.",
+ liens:"↔ Zola : parallèle fort avec la scène du pont chez Claude (fin ch. XI) — Judith meurt de ne pas pouvoir créer, Claude se rapproche de la mort à force de trop s'acharner à créer. ↔ Platon : aucun équivalent — l'Ion ne traite jamais des conditions d'accès à la position de créateur.",
+ quote:"« elle se tua un soir d'hiver » [chap. III]"},
+
+{id:"woolf-androgyne",work:"woolf",star:3,title:"L'esprit androgyne",loc:"Un lieu à soi, chapitre VI",
+ contexte:"Dernier chapitre : après avoir parcouru les obstacles matériels (I-II), l'histoire des femmes écrivaines (III-IV) et la production contemporaine (V), la narratrice conclut différemment.",
+ fait:"Woolf avance que « un grand esprit est androgyne » : la création la plus puissante fusionnerait les parts masculine et féminine de l'esprit.",
+ explication:"Ce déplacement final est important : Woolf ne réduit pas la création à une question de moyens matériels — elle la reconduit vers une qualité intérieure de l'esprit, capable de dépasser les catégories figées.",
+ retenir:"L'essai se referme sur une idée d'ouverture et de fusion, pas sur une revendication identitaire fermée.",
+ theme:"Clé pour « qui peut créer » et la nature de l'esprit créateur — ne pas réduire l'essai à sa seule dimension matérialiste.",
+ liens:"↔ Platon : rapprochement possible mais prudent — l'esprit androgyne embrasse plusieurs points de vue, le poète platonicien est entièrement traversé par une seule force extérieure. ↔ Zola : aucun équivalent, Zola ne théorise jamais la nature psychique de l'esprit créateur.",
+ quote:"« un grand esprit est androgyne » [chap. VI]"},
+
+{id:"woolf-toile",work:"woolf",star:2,title:"La fiction comme toile d'araignée",loc:"Un lieu à soi, chapitre III (ouverture)",
+ contexte:"La narratrice vient de renoncer à chercher une vérité abstraite sur la pauvreté des femmes ; elle se tourne vers les faits historiques.",
+ fait:"Elle formule une image : la fiction ressemble à une toile d'araignée, attachée à la vie par les quatre coins.",
+ explication:"Cette image sert de transition méthodologique : puisque la fiction dépend matériellement de la vie de qui l'écrit, il faut étudier les conditions concrètes de l'existence plutôt que le seul talent.",
+ retenir:"Image très citable, courte et frappante.",
+ theme:"Directement utile pour « conditions matérielles » et « création et vie ».",
+ liens:"↔ Zola : écho concret et non théorisé dans les contraintes économiques précises du roman (loyer du hangar, petits travaux alimentaires).",
+ quote:"la fiction « ressemble à une toile d'araignée... attachée à la vie par les quatre coins » [chap. III]"},
+
+{id:"woolf-carmichael",work:"woolf",star:2,title:"Mary Carmichael, romancière fictive",loc:"Un lieu à soi, chapitre V (ouverture)",
+ contexte:"La narratrice, à la bibliothèque, arrive au rayon des livres écrits par des femmes vivantes en 1929.",
+ fait:"Elle constate que les femmes écrivent désormais dans tous les genres, pas seulement le roman, et introduit une romancière fictive, Mary Carmichael, comme exemple de cette nouvelle génération.",
+ explication:"Le développement narratif précis de ce personnage n'a pas été vérifié en détail dans ce guide — à lire directement si besoin.",
+ retenir:"Mary Carmichael symbolise l'élargissement du champ d'écriture féminine.",
+ theme:"Utile pour « qui peut créer aujourd'hui » en contraste avec Judith Shakespeare.",
+ liens:"↔ Zola : contraste de méthode — Woolf construit un exemple fictif pour illustrer un progrès social, Zola construit un roman entier autour d'un échec individuel.",
+ quote:""},
+
+{id:"woolf-behn",work:"woolf",star:3,title:"Aphra Behn : le tournant décisif",loc:"Un lieu à soi, chapitre IV",
+ contexte:"La narratrice vient de montrer que les femmes écrivaines des XVIe-XVIIe siècles (Lady Winchilsea, Dorothy Osborne) écrivaient seules, sans public, dans l'isolement de leurs terres.",
+ fait:"Aphra Behn (1640-1689), femme de la classe moyenne, veuve, est forcée par la nécessité à gagner sa vie par sa plume — elle y parvient, la première.",
+ explication:"« L'importance de ce fait pèse plus lourd que tout ce qu'elle a écrit. » Désormais une femme peut dire à ses parents « je peux vivre de ma plume » — même si la réponse reste longtemps hostile. Ce n'est pas la qualité littéraire d'Aphra Behn qui compte le plus pour Woolf, mais le fait qu'elle ait prouvé qu'écrire pouvait faire vivre une femme.",
+ retenir:"Aphra Behn est la charnière historique entre l'écriture aristocratique isolée et l'écriture comme métier accessible aux femmes ordinaires.",
+ theme:"Illustration concrète et datée de la thèse centrale de Woolf (argent → liberté de création). Woolf ajoute que cette liberté se paie « au sacrifice, peut-être, de certaines qualités agréables ».",
+ liens:"↔ Zola : rapprochement possible avec les petits travaux alimentaires de Claude (peindre des fleurs pour l'Angleterre) — dans les deux cas, l'art doit d'abord se plier à une nécessité économique. ↔ Platon : aucun équivalent, l'Ion ne traite jamais de vivre matériellement de son art.",
+ quote:"« c'est elle qui leur a obtenu le droit de dire ce qu'elles pensent » [ch. IV]"},
+
+{id:"woolf-austen",work:"woolf",star:2,title:"Jane Austen et le salon commun",loc:"Un lieu à soi, chapitre IV",
+ contexte:"La narratrice s'interroge sur pourquoi Austen, les sœurs Brontë et George Eliot ont toutes écrit des romans, alors que rien ne les y prédisposait naturellement selon elle.",
+ fait:"Woolf cite le neveu-biographe de Jane Austen : elle écrivait dans le salon familial commun, sans bureau à elle, cachant son manuscrit sous un buvard dès qu'on entrait.",
+ explication:"La forme (le roman, plus facile à interrompre que le théâtre en vers) et les conditions d'écriture sont présentées comme des conséquences du manque d'espace et d'intimité. Pourtant, après relecture directe de Pride and Prejudice, Woolf ne trouve « pas le moindre signe que les circonstances aient abîmé son travail ».",
+ retenir:"Woolf tient ensemble deux idées en tension : les conditions matérielles pèsent sur le contexte d'écriture, mais n'empêchent pas nécessairement une œuvre d'atteindre la perfection.",
+ theme:"Nuance importante à la thèse centrale — avoir un « lieu à soi » n'est pas une condition absolue de la réussite esthétique, mais Woolf n'en minimise pas les obstacles pour autant : elle en fait un « miracle ».",
+ liens:"↔ Zola : contraste avec Claude, qui dispose d'un espace considérable (le hangar de Montmartre) sans que cela lui garantisse la réussite — ni l'absence ni la présence d'un « lieu à soi » ne déterminent mécaniquement l'issue de la création.",
+ quote:"« sans haine, sans amertume, sans peur, sans protestation, sans sermon » [ch. IV]"},
+
+{id:"woolf-winchilsea",work:"woolf",star:1,title:"Lady Winchilsea",loc:"Un lieu à soi, chapitres III-IV",
+ contexte:"Première femme écrivaine nommément développée par la narratrice après l'expérience de pensée sur Judith Shakespeare.",
+ fait:"La narratrice constate que le talent de Lady Winchilsea (aristocrate du XVIIe siècle) s'est « étiolé », déformé par la colère et l'amertume contre sa condition.",
+ explication:"[À VÉRIFIER : contenu précis des poèmes cités non relu en détail.] Winchilsea sert d'exemple d'un grand talent entravé, non par manque total de moyens (elle est aristocrate), mais par l'hostilité sociale à l'écriture féminine.",
+ retenir:"Contre-exemple utile à Judith Shakespeare : ici le talent existe et produit quelque chose, mais une œuvre marquée et « étiolée » par la frustration.",
+ theme:"Illustre que les obstacles sociaux ne détruisent pas seulement l'accès à la création mais peuvent en déformer le contenu même.",
+ liens:"↔ Zola : rapprochement prudent avec la souffrance de Claude qui s'imprime dans l'œuvre (la toile de l'enfant mort) — mais chez Winchilsea la douleur l'abîme selon Woolf, alors que chez Claude elle la rend meilleure.",
+ quote:""}
+];
+
+const CITATIONS = [
+ {work:"platon",text:"le poète est chose ailée, légère, et sainte",loc:"Ion, 534b",idea:"Nature du poète inspiré.",usage:"Citation d'ouverture pour tout développement sur l'inspiration."},
+ {work:"platon",text:"Veux-tu être considéré par nous comme un tricheur ou comme un homme divin ?",loc:"Ion, 542a-b",idea:"Dilemme final de Socrate à Ion.",usage:"Conclusion d'un paragraphe sur la dévalorisation du discours du rapsode."},
+ {work:"platon",text:"il est beaucoup plus beau de passer pour un homme divin",loc:"Ion, 542b",idea:"Réponse d'Ion, qui choisit la flatterie contre le savoir.",usage:"À mettre en regard direct de la citation précédente."},
+ {work:"zola",text:"Allons travailler.",loc:"L'Œuvre, dernière ligne, p. 775",idea:"La vie / le travail créateur continue au-delà du deuil.",usage:"Citation de chute, très efficace en fin de développement ou de conclusion."},
+ {work:"zola",text:"Ce fut un meurtre véritable, un écrasement",loc:"L'Œuvre, fin ch. II",idea:"Violence du créateur contre sa propre œuvre.",usage:"Illustrer « le créateur n'est pas maître de son œuvre »."},
+ {work:"zola",text:"cette sacrée peinture était un métier du tonnerre de Dieu",loc:"L'Œuvre, fin ch. III",idea:"Dureté du métier de peintre, même pour un artiste reconnu.",usage:"Nuancer l'idée de génie facile."},
+ {work:"zola",text:"l'épouse diminuait l'amante",loc:"L'Œuvre, fin ch. VIII",idea:"Le mariage tue la passion.",usage:"Illustrer « création et vie affective »."},
+ {work:"zola",text:"un chef-d'œuvre de clarté et de puissance, avec une immense tristesse en plus",loc:"L'Œuvre, fin ch. IX",idea:"Le deuil transformé en réussite esthétique.",usage:"Illustrer « création et souffrance »."},
+ {work:"zola",text:"cette douceur de mourir",loc:"L'Œuvre, fin ch. XI",idea:"Idéation suicidaire liée à l'échec créateur.",usage:"Point culminant du motif « création et destruction »."},
+ {work:"zola",text:"je donnerais dix ans de ma vie, pour avoir peint votre grande coquine de femme",loc:"L'Œuvre, ch. V",idea:"Éloge de pair à pair, ambivalence de la reconnaissance.",usage:"Illustrer « création et reconnaissance »."},
+ {work:"woolf",text:"une femme doit avoir de l'argent et un lieu à elle",loc:"Un lieu à soi, chap. I",idea:"Thèse centrale de l'essai.",usage:"Citation d'ouverture quasi obligatoire pour tout développement sur Woolf."},
+ {work:"woolf",text:"un grand esprit est androgyne",loc:"Un lieu à soi, chap. VI",idea:"Conception de l'esprit créateur au-delà du genre.",usage:"Conclusion d'un développement sur les conditions internes de la création."},
+ {work:"woolf",text:"attachée à la vie par les quatre coins",loc:"Un lieu à soi, chap. III",idea:"La création n'est jamais coupée du réel matériel.",usage:"Très utile pour toute problématique sur « conditions matérielles »."},
+ {work:"woolf",text:"elle se tua un soir d'hiver",loc:"Un lieu à soi, chap. III (Judith Shakespeare)",idea:"Fin tragique du génie sans moyens de s'exercer.",usage:"À rapprocher directement de la scène du pont chez Zola."},
+ {work:"woolf",text:"c'est elle qui leur a obtenu le droit de dire ce qu'elles pensent",loc:"Un lieu à soi, chap. IV (à propos d'Aphra Behn)",idea:"La liberté d'expression féminine a une origine historique matérielle précise.",usage:"Illustrer « conditions matérielles » avec un exemple daté et concret."},
+ {work:"woolf",text:"gagnez cinq cents livres par an grâce à votre intellect",loc:"Un lieu à soi, chap. IV",idea:"Formule directe de la thèse matérialiste.",usage:"Citation de chute pour un paragraphe sur l'argent comme condition de la liberté créatrice."},
+ {work:"woolf",text:"sans haine, sans amertume, sans peur, sans protestation, sans sermon",loc:"Un lieu à soi, chap. IV (à propos de Jane Austen)",idea:"Une œuvre peut atteindre la sérénité malgré des conditions matérielles très contraintes.",usage:"Nuancer toute lecture trop mécaniquement déterministe de la thèse woolfienne."},
+ {work:"republique",text:"il est l'imitateur de cet objet, dont eux sont les artisans",loc:"La République X, 597e",idea:"Définition du peintre comme imitateur, troisième à partir de la vérité.",usage:"Citation d'ouverture pour tout développement sur mimèsis et vérité."},
+ {work:"republique",text:"l'imitateur ne possédera pas de savoir et il n'aura pas d'opinion correcte relativement aux objets qu'il imite",loc:"La République X, 602a-b",idea:"L'imitateur est le dernier de la hiérarchie de la connaissance.",usage:"Illustrer « le discours sur l'art ne vaut pas savoir »."},
+ {work:"republique",text:"le médiocre s'accouplant au médiocre, l'art imitatif n'engendre que du médiocre",loc:"La République X, 603b",idea:"Conclusion sévère sur la valeur de l'art imitatif.",usage:"Citation de chute pour un paragraphe critique sur la mimèsis."},
+ {work:"republique",text:"il est ancien le conflit entre la philosophie et l'art de la poésie",loc:"La République X, 607b",idea:"Formule célèbre résumant la tension entre les deux disciplines.",usage:"Excellente citation d'ouverture ou de transition sur le statut de l'art."}
+];
+
+const COMPARAISON = [
+["D'où vient la création ?","Possession divine transmise en chaîne [534a-536d]","Travail acharné, quasi charnel, sur la matière (ch. IX)","Conditions matérielles d'abord, puis fusion androgyne (chap. I et VI)"],
+["Le créateur maîtrise-t-il son œuvre ?","Non — « hors de lui-même », esprit qui a cessé de lui appartenir [534b]","Non — dépassé, va jusqu'à mutiler sa propre toile (fin ch. II)","Question déplacée : l'accès à la position de créatrice, pas la maîtrise (chap. III)"],
+["Création et travail","Absent — Socrate oppose justement technè et inspiration [531c-533c]","Central : travail visible, douloureux, répété (Bongrand, fin ch. III)","Peu traité de l'intérieur ; conditions préalables plutôt"],
+["Création et inspiration","Thème central — pierre magnétique [533d-e]","Peu présente ; plutôt obsession et acharnement","Peu développée en tant que telle"],
+["Création et vérité","Le rapsode ne détient pas la vérité technique [537a-539d]","« L'Enfant mort » jugé chef-d'œuvre car il capte une douleur réelle (fin ch. IX)","La fiction « contient plus de vérité que les faits » (chap. I)"],
+["Création et imitation","L'art imitatif est à trois degrés de la vérité (Forme → objet → image) ; l'imitateur n'a ni savoir ni opinion correcte [596a-602b]. La poésie nourrit dangereusement la partie irrationnelle de l'âme [603c-606d]","Claude peint d'après Christine mais s'en écarte (ch. IV) ; la toile de l'enfant mort jugée supérieure parce que vraie — position presque inverse de Platon","Non traité directement"],
+["Création et souffrance","Absent du texte","Omniprésent : auto-mutilation, deuil, idéation suicidaire","Présente en creux : Judith Shakespeare meurt de ne pas pouvoir créer"],
+["Création et liberté","Le poète n'est pas libre, mené par la divinité [534d]","Claude prisonnier de son obsession, non libre sans contrainte extérieure","Centrale : liberté dépend de conditions matérielles concrètes"],
+["Création et société","Concours d'Épidaure, Panathénées [530a-b]","Salon, jury, arrivisme (Fagerolles)","Institutions qui excluent matériellement (universités, bibliothèques)"],
+["Conditions matérielles","Non traitées","Présentes en arrière-plan (loyer du hangar, ch. IX)","Le sujet même de l'essai (chap. I)"],
+["Rapport créateur / œuvre","Le créateur est un « anneau » dans une chaîne qui le dépasse [536a-b]","Rapport fusionnel et destructeur","Peu développé directement"],
+["Art et vie","Peu traité","Fusion totale et problématique : vie du couple sacrifiée à l'œuvre","Fiction « attachée à la vie par les quatre coins » (chap. III)"],
+["Qui peut créer ?","Seul celui que la Muse a choisi [536b]","Talent individuel non central","Question centrale : accès à l'argent, au temps, à l'instruction"],
+["Création et reconnaissance","Ion cherche la couronne d'or [530d]","Salon, jury, angoisse du jugement","Anonymat fréquent, faute même d'avoir pu produire une œuvre"]
+];
+
+const ARGUMENTS = [
+{these:"Le créateur n'est pas maître de son œuvre.",exp:"Que ce soit par possession divine ou par obsession psychologique, les trois auteurs montrent, à des degrés très différents, un créateur dépassé par ce qu'il produit.",ex:"Ion, image de la pierre magnétique [533d-e] ; L'Œuvre, auto-mutilation de la toile [fin ch. II].",nuance:"Woolf ne traite pas cette question — chez elle, le problème n'est pas la maîtrise de l'œuvre mais l'accès à sa réalisation.",form:"« Si Platon fait du poète un possédé et Zola un obsédé, la maîtrise de l'œuvre par son créateur apparaît, dans les deux cas, comme une illusion. »"},
+{these:"Le discours sur l'art ne vaut pas savoir sur l'art.",exp:"Socrate démontre qu'Ion, malgré son éloquence sur Homère, ne possède aucun savoir technique vérifiable — c'est toujours le spécialiste du métier qui juge en dernier ressort.",ex:"Ion, série d'exemples techniques [537a-539d].",nuance:"Le roman de Zola légitime au contraire le discours des artistes eux-mêmes sur leur art (Bongrand, Sandoz).",form:"« Parler bien de la création n'est pas créer ; Platon en tire une dévalorisation que le roman zolien ne partage pas. »"},
+{these:"La création se paie d'un prix corporel et personnel.",exp:"Chez Zola, la création est indissociable de la souffrance physique et psychique.",ex:"Fin ch. II, fin ch. IX, fin ch. XI.",nuance:"Chez Platon, le poète inspiré est décrit heureux, « ailé », sans souffrance.",form:"« Là où Zola fait de la création un corps à corps douloureux, l'Ion la présente comme un état de grâce. »"},
+{these:"Le génie ne suffit pas ; il faut les conditions matérielles pour créer.",exp:"L'expérience de Judith Shakespeare démontre que le talent seul ne produit aucune œuvre sans argent, temps, espace et liberté.",ex:"Woolf, chap. III.",nuance:"Le roman de Zola présente un cas inverse — Claude a l'espace et une compagne dévouée, et pourtant échoue.",form:"« Si Woolf montre que sans les conditions matérielles le génie s'éteint, Zola montre qu'avec elles il peut tout aussi bien s'épuiser. »"},
+{these:"La création transforme, et parfois efface, la personne réelle qui en est à l'origine.",exp:"Claude peint Christine mais fait disparaître ses traits réels sous une figure inventée.",ex:"Ch. IV, « quelle était cette femme nouvelle... qui perçait sous la sienne ? »",nuance:"Chez Platon, le rapport entre créateur et modèle vivant n'est jamais interrogé ainsi.",form:"« Le modèle vivant, chez Zola, est absorbé par l'œuvre au point de s'y perdre. »"},
+{these:"La reconnaissance sociale façonne autant la création que le talent lui-même.",exp:"Tout le roman de Zola est structuré par l'angoisse du jugement institutionnel.",ex:"Ch. V (Salon des Refusés) ; ch. X (Fagerolles).",nuance:"Chez Woolf, l'exclusion institutionnelle empêche même d'accéder à la création.",form:"« L'institution artistique conditionne chez Zola le jugement de l'œuvre, chez Woolf l'accès même à sa production. »"},
+{these:"L'inspiration, chez Platon, dispense le créateur de toute responsabilité sur son discours.",exp:"Si le poète parle par la divinité, il ne peut ni se tromper en son nom, ni revendiquer un mérite personnel.",ex:"Dilemme final, « tricheur ou homme divin » [541e-542b].",nuance:"Chez Zola, Claude est pleinement responsable, jusqu'à l'auto-destruction, de ce qu'il produit.",form:"« L'irresponsabilité heureuse du poète platonicien contraste avec la responsabilité totale, et destructrice, de l'artiste zolien. »"},
+{these:"La fiction n'est jamais coupée du réel matériel qui la rend possible.",exp:"Woolf compare la fiction à une toile d'araignée, attachée à la vie par les quatre coins.",ex:"Chap. III.",nuance:"Zola illustre concrètement cette idée sans la théoriser (loyer du hangar, petits travaux alimentaires).",form:"« L'image woolfienne trouve une illustration concrète dans les contraintes économiques que Zola fait peser sur Claude. »"},
+{these:"Créer peut se faire au prix de la vie affective et conjugale.",exp:"Le mariage de Claude et Christine se délite à mesure que l'œuvre grandit.",ex:"Fin ch. VIII ; fin ch. XII.",nuance:"Rien de comparable chez Platon ; chez Woolf, l'absence de compagnon est présentée comme favorable à la création chez certaines femmes.",form:"« Chez Zola, l'œuvre grandit à mesure que le couple se défait. »"},
+{these:"Le deuil peut devenir, sans être moralement jugé par le texte, une source de création.",exp:"Claude peint le corps de son enfant mort et en tire ce que Sandoz qualifie de chef-d'œuvre.",ex:"Fin ch. IX.",nuance:"Impensable dans le cadre de l'Ion, où la création reste collective et festive.",form:"« Zola expose, sans juger, la possibilité vertigineuse que la plus grande douleur produise la plus grande réussite esthétique. »"},
+{these:"L'esprit créateur le plus puissant dépasse les catégories figées, dont celle du genre.",exp:"Woolf conclut que le grand esprit est androgyne, fusion du masculin et du féminin.",ex:"Chap. VI.",nuance:"Aucun équivalent chez Platon ou Zola — à ne pas plaquer artificiellement.",form:"« Woolf déplace, en fin de parcours, la question des conditions matérielles vers une conception de l'esprit créateur lui-même. »"},
+{these:"Refuser de conclure peut être un choix méthodologique fort face à la question de la création.",exp:"Woolf annonce dès le chapitre I qu'elle ne tranchera pas.",ex:"Chap. I.",nuance:"Platon mène son dialogue à une conclusion nette ; Zola clôt sur une phrase brève et presque impérative.",form:"« Trois manières de finir sans conclure vraiment : le dilemme de Socrate, l'ouverture de Woolf, l'injonction sobre de Sandoz. »"},
+{these:"L'art qui imite s'éloigne nécessairement de la vérité, quel que soit son talent.",exp:"Platon montre, par la théorie des trois lits, que même le meilleur peintre ne produit qu'une image d'une image — jamais l'objet réel, encore moins sa Forme.",ex:"République X, 596a-598c.",nuance:"Zola prend le contre-pied implicite — la toile de l'enfant mort est valorisée précisément parce qu'elle est jugée vraie, porteuse d'une douleur réelle.",form:"« Là où Platon voit dans l'image un affaiblissement nécessaire de la vérité, Zola donne à voir une image jugée supérieure parce que vraie : deux conceptions inconciliables. »"},
+{these:"Le créateur n'a ni le savoir de celui qui sait, ni même une opinion droite sur ce qu'il représente.",exp:"La triade usager/fabricant/imitateur place le créateur au dernier rang de la hiérarchie de la connaissance.",ex:"République X, 601c-602b.",nuance:"L'Œuvre de Zola prend le contre-pied par la bouche de Bongrand et Sandoz, dont le discours sur la peinture est présenté comme légitime.",form:"« Si Platon retire à l'imitateur toute autorité cognitive, le roman de Zola la lui restitue en partie par la voix de Bongrand. »"},
+{these:"La création peut agir dangereusement sur l'équilibre psychologique de celui qui la reçoit.",exp:"Platon montre que le plaisir pris à la lamentation d'un héros de théâtre nourrit, par contagion, la même tendance dans le deuil réel du spectateur.",ex:"République X, 603c-606d.",nuance:"Cet argument peut se retourner en faveur d'une thèse cathartique inverse — Platon choisit ici l'hypothèse du renforcement, pas de la purge.",form:"« L'angoisse platonicienne devant le pouvoir de la représentation trouve une illustration presque littérale dans la scène où Claude peint son enfant mort. »"},
+{these:"Le rejet de la poésie par Platon n'est pas un dogme fermé, mais un bannissement sous condition.",exp:"Socrate laisse ouverte la possibilité d'une défense rationnelle de la poésie, qu'il n'a lui-même jamais reçue.",ex:"République X, 607b-608b.",nuance:"Ce refus de trancher peut être rapproché du refus de conclure de Woolf, bien que leurs motifs diffèrent profondément.",form:"« Ni Platon ni Woolf ne referment tout à fait la question de la création — l'un par prudence méthodologique, l'autre parce que la preuve espérée ne vient jamais. »"}
+];
+
+const QUIZ = [
+{level:1,q:"Dans l'Ion, de quelle ville Ion revient-il au début du dialogue, et pourquoi ?",a:"D'Épidaure, où se tenaient des jeux en l'honneur d'Esculape, incluant un concours de rapsodes [530a-b]."},
+{level:1,q:"Combien de chapitres compte L'Œuvre dans l'édition fournie ?",a:"12 chapitres (I à XII), vérifié par extraction du fichier."},
+{level:1,q:"Quel événement historique réel sert de cadre au chapitre V de L'Œuvre ?",a:"Le Salon des Refusés de 1863."},
+{level:1,q:"Dans Un lieu à soi, quelle profession le frère de Judith Shakespeare exerce-t-il dans l'expérience de pensée de Woolf ?",a:"Acteur puis dramaturge à succès à Londres."},
+{level:1,q:"Comment meurt Judith Shakespeare (dans la fiction imaginée par Woolf) ?",a:"Elle se suicide, un soir d'hiver, après s'être retrouvée enceinte du directeur de théâtre qui avait ri de ses ambitions."},
+{level:2,q:"Pourquoi Socrate conclut-il qu'Ion n'a pas d'art sur Homère ?",a:"Un art véritable permet de juger tous les représentants d'un même domaine (le bon et le mauvais), alors qu'Ion ne parle bien que d'Homère et reste engourdi sur les autres poètes traitant pourtant des mêmes sujets [531a-533c]."},
+{level:2,q:"Que révèle la scène de l'auto-destruction de la toile (fin ch. II) sur le rapport de Claude à sa création ?",a:"Que Claude n'est jamais en paix avec son œuvre : rapport de violence et d'insatisfaction permanente, au point de détruire ce qu'il vient de produire plutôt que de le laisser imparfait."},
+{level:2,q:"En quoi le refus de conclure de Woolf, dès le chapitre I, est-il un choix méthodologique et pas seulement une prudence rhétorique ?",a:"Elle affirme que sur un sujet « hautement polémique », personne ne peut espérer dire la vérité — elle montre donc un cheminement de pensée plutôt que d'asséner une conclusion, cohérent avec sa thèse."},
+{level:3,q:"Comparez la façon dont Platon et Zola traitent la question de la maîtrise du créateur sur son œuvre.",a:"Chez Platon, le poète n'est pas maître de son discours car possédé par une force divine extérieure et heureuse. Chez Zola, Claude n'est pas non plus maître de son œuvre, mais pour une raison opposée : une obsession intérieure et destructrice. Deux formes de dépossession, l'une extatique, l'autre pathologique."},
+{level:3,q:"En quoi le parallèle entre Judith Shakespeare (Woolf) et Claude sur le pont (Zola) est-il pertinent et à manier avec prudence ?",a:"Pertinent car les deux scènes associent explicitement mort et rapport à la création. À manier avec prudence car les logiques sont inverses : Judith meurt de ne pas pouvoir créer (empêchement social), Claude se rapproche de la mort en créant trop et en échouant (excès individuel)."},
+{level:4,q:"« Le créateur est-il maître de son œuvre ? » Esquissez un plan en 2 ou 3 parties.",a:"1) Non, le créateur est dépossédé — force extérieure heureuse (Platon) ou obsession intérieure destructrice (Zola). 2) Cette dépossession a un prix très inégal — grâce heureuse chez Platon, souffrance et danger de mort chez Zola. 3) Chez Woolf, la question se déplace : le problème n'est pas de maîtriser une œuvre en cours, mais d'accéder à la possibilité même de créer."},
+{level:4,q:"Dans quelle mesure la création dépend-elle de conditions extérieures au talent individuel ?",a:"Utiliser Woolf (thèse + Judith Shakespeare) comme argument principal ; nuancer avec Zola qui montre que les conditions matérielles ne garantissent pas la réussite (nécessaires mais non suffisantes) ; l'Ion peut servir de contrepoint, montrant que même les conditions sociales réunies laissent incertaine la nature du don créateur."},
+{level:5,q:"Sujet d'entraînement : « Créer, est-ce toujours risquer de se perdre ? » (Platon, Zola)",a:"Mobilisez au moins 2 œuvres, 2 citations vérifiées, et un rapprochement explicite entre deux auteurs."},
+{level:5,q:"Sujet d'entraînement : « Le talent suffit-il à faire un créateur ? » (les trois œuvres)",a:"Mobilisez au moins 2 œuvres, 2 citations vérifiées, et un rapprochement explicite entre deux auteurs."},
+{level:5,q:"Sujet d'entraînement : « La création a-t-elle un prix ? » (Zola, Woolf)",a:"Mobilisez au moins 2 œuvres, 2 citations vérifiées, et un rapprochement explicite entre deux auteurs."}
+];
+
+const FLASHCARDS = [
+{q:"Que dit Socrate à Ion sur la nature du poète ?",a:"Le poète n'a pas d'art (technè) ; il est possédé par une force divine, image de la pierre magnétique [533d-534e]."},
+{q:"Comment se termine le dialogue de l'Ion ?",a:"Sur un dilemme : « tricheur ou homme divin ? » — Ion choisit d'être « homme divin » [541e-542b]."},
+{q:"Que fait Claude à la fin du chapitre II de L'Œuvre ?",a:"Il détruit lui-même sa toile à coups de couteau à palette, dans un accès de rage — « un meurtre véritable »."},
+{q:"Que dit Bongrand à Claude sur le métier de peintre (fin ch. III) ?",a:"Que c'est « un métier du tonnerre de Dieu », difficile même pour un peintre déjà reconnu."},
+{q:"Que se passe-t-il à la fin du chapitre IX de L'Œuvre ?",a:"L'enfant du couple meurt ; Claude peint son corps et envoie cette toile au Salon plutôt que son grand tableau."},
+{q:"Que fait Claude sur le pont, à la fin du chapitre XI ?",a:"Il lutte contre « cette douceur de mourir » — idéation suicidaire explicite, sans que le mot soit prononcé."},
+{q:"Quelle est la dernière phrase de L'Œuvre ?",a:"« Allons travailler. » — prononcée par Sandoz devant la tombe."},
+{q:"Quelle est la thèse centrale de Un lieu à soi ?",a:"Une femme doit avoir de l'argent et un lieu à elle si elle veut écrire de la fiction [chap. I]."},
+{q:"Qui est Judith Shakespeare et comment meurt-elle ?",a:"Sœur imaginaire de Shakespeare, aussi douée que lui mais privée d'instruction et de liberté ; elle se suicide un soir d'hiver, faute d'avoir pu exercer son génie [chap. III]."},
+{q:"Que veut dire Woolf par « un grand esprit est androgyne » ?",a:"Que la création la plus puissante fusionne les parts masculine et féminine de l'esprit, plutôt que de s'enfermer dans un point de vue sexué unique [chap. VI]."},
+{q:"Quel est le rapprochement le plus solide entre Zola et Woolf ?",a:"Le pont de Claude (mort par excès de création) et le suicide de Judith Shakespeare (mort par impossibilité de créer) — deux morts liées à la création, dans des directions opposées."},
+{q:"En quoi Platon et Zola s'opposent-ils sur la dépossession du créateur ?",a:"Chez Platon, la dépossession est heureuse et divine (le poète « ailé »). Chez Zola, elle est douloureuse et destructrice (auto-mutilation, obsession)."}
+];
+
+const WORKS_META = {
+ platon:{name:"Platon — Ion",overview:"Dialogue socratique où Socrate interroge Ion, rhapsode d'Éphèse, sur la nature de son savoir : Ion n'a pas d'art (technè) sur Homère, seulement une possession divine transmise par une chaîne d'inspiration (Muse → poète → rapsode → spectateur). Le dialogue se referme sur un dilemme qui dévalue l'autorité cognitive d'Ion."},
+ republique:{name:"Platon — La République (Livre X)",overview:"Dialogue distinct de l'Ion, beaucoup plus long, consacré à la cité idéale. Le Livre X (595a-608b) est le seul fragment au programme : Socrate y justifie le bannissement de la poésie imitative par la théorie des trois lits (Forme → objet → image), la triade usager/fabricant/imitateur, et l'effet psychologique dangereux de la poésie sur l'âme."},
+ zola:{name:"Zola — L'Œuvre",overview:"Roman en 12 chapitres. Claude Lantier, peintre, rencontre Christine sous un orage ; leur histoire se construit et se défait au rythme de son grand tableau obsessionnel, jusqu'à l'auto-destruction, la mort de leur enfant transformée en œuvre, et une dérive suicidaire qui culmine dans le dénouement funèbre — « Allons travailler »."},
+ woolf:{name:"Woolf — Un lieu à soi",overview:"Essai en 6 chapitres (1928/29) : une narratrice réfléchit, sur deux jours et demi, aux conditions matérielles de la création chez les femmes. Thèse centrale : argent et lieu à soi. Point culminant historique : l'expérience de pensée de Judith Shakespeare. Conclusion : l'esprit créateur le plus puissant est androgyne."}
+};
+
+/* =========================================================
+   ÉTAT + PERSISTANCE (localStorage)
+   ========================================================= */
+const STORE_KEY = "arcanes-creation-progress-v1";
+function loadStore(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {read:{},bookmarks:{},filter:"all"}; }
+  catch(e){ return {read:{},bookmarks:{},filter:"all"}; }
+}
+function saveStore(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+let state = loadStore();
+if(!state.read) state.read = {};
+if(!state.bookmarks) state.bookmarks = {};
+if(!state.filter) state.filter = "all";
+
+let currentPage = "accueil";
+let fcIndex = 0;
+let fcFlipped = false;
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+function go(page){
+  currentPage = page;
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.page===page));
+  render();
+  document.getElementById("main").scrollTop = 0;
+  window.scrollTo(0,0);
+  closeSidebar();
+}
+document.querySelectorAll(".nav-btn[data-page]").forEach(b=>{
+  b.addEventListener("click", ()=>go(b.dataset.page));
+});
+function closeSidebar(){
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
+}
+document.getElementById("menu-toggle").addEventListener("click", ()=>{
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
+});
+document.getElementById("overlay").addEventListener("click", closeSidebar);
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+function updateProgressBar(){
+  const total = PASSAGES.length;
+  const done = Object.values(state.read).filter(Boolean).length;
+  const pct = total? Math.round(done/total*100):0;
+  document.getElementById("progress-label").textContent = done+" / "+total+" passages étudiés";
+  document.getElementById("progress-fill").style.width = pct+"%";
+  document.getElementById("progress-pct").textContent = pct+"%";
+}
+function workProgress(work){
+  const items = PASSAGES.filter(p=>p.work===work);
+  const done = items.filter(p=>state.read[p.id]).length;
+  return {done,total:items.length,pct: items.length? Math.round(done/items.length*100):0};
+}
+function toggleRead(id){
+  state.read[id] = !state.read[id];
+  saveStore(); updateProgressBar(); render();
+}
+function toggleBookmark(id){
+  state.bookmarks[id] = !state.bookmarks[id];
+  saveStore(); render();
+}
+
+/* =========================================================
+   RENDER HELPERS
+   ========================================================= */
+function stars(n){ return "★".repeat(n)+"☆".repeat(3-n); }
+
+function passageCard(p){
+  const isRead = !!state.read[p.id];
+  const isBm = !!state.bookmarks[p.id];
+  return `<div class="passage p${p.star}" data-pid="${p.id}">
+    <div class="passage-head">
+      <div>
+        <div class="stars">${stars(p.star)} ${p.star===3?"À LIRE IMPÉRATIVEMENT":p.star===2?"IMPORTANT":"COMPLÉMENT"}</div>
+        <h3>${p.title}</h3>
+        <div class="passage-loc">${p.loc}</div>
+      </div>
+    </div>
+    <div class="passage-body">
+      ${p.quote?`<blockquote class="quote">${p.quote}</blockquote>`:""}
+      <div class="sect"><div class="sect-label">Contexte</div><p>${p.contexte}</p></div>
+      <div class="sect"><div class="sect-label">Ce qui se passe</div><p>${p.fait}</p></div>
+      <div class="sect"><div class="sect-label">Explication</div><p>${p.explication}</p></div>
+      <div class="sect"><div class="sect-label">À retenir</div><p>${p.retenir}</p></div>
+      <div class="sect"><div class="sect-label">Pour le thème</div><p>${p.theme}</p></div>
+      <div class="sect"><div class="sect-label">Liens avec les autres œuvres</div><p>${p.liens}</p></div>
+    </div>
+    <div class="passage-actions">
+      <label class="chk"><input type="checkbox" ${isRead?"checked":""} onchange="toggleRead('${p.id}')"> Passage lu</label>
+      <button class="bm-btn ${isBm?"active":""}" onclick="toggleBookmark('${p.id}')">${isBm?"★ À revoir":"☆ Marquer à revoir"}</button>
+    </div>
+  </div>`;
+}
+
+function filterBar(){
+  const opts = [["all","Tous"],[3,"⭐⭐⭐"],[2,"⭐⭐"],[1,"⭐"]];
+  return `<div class="filters">${opts.map(([v,l])=>
+    `<button class="filter-pill ${state.filter==v?"active":""}" onclick="setFilter('${v}')">${l}</button>`
+  ).join("")}</div>`;
+}
+function setFilter(v){ state.filter = v==="all"?"all":parseInt(v); saveStore(); render(); }
+
+function passagesFor(work){
+  let list = PASSAGES.filter(p=>p.work===work);
+  if(state.filter!=="all") list = list.filter(p=>p.star===state.filter);
+  return list;
+}
+
+/* =========================================================
+   PAGES
+   ========================================================= */
+function pageAccueil(){
+  return `
+  <div class="hero">
+    <h1>Les arcanes de la création</h1>
+    <p class="lead">Guide de lecture accélérée pour la dissertation de CPGE — Platon (Ion + La République), Zola (L'Œuvre), Woolf (Un lieu à soi). Choisissez votre parcours selon le temps disponible.</p>
+  </div>
+  <div class="parcours-grid">
+    <div class="parcours-card" onclick="go('parcours2h')"><span class="emoji">⚡</span><h3>2 heures</h3><p>Je dois comprendre l'essentiel immédiatement.</p></div>
+    <div class="parcours-card" onclick="go('parcours5h')"><span class="emoji">📚</span><h3>5 heures</h3><p>Je veux une vraie maîtrise générale des œuvres.</p></div>
+    <div class="parcours-card" onclick="go('parcours10h')"><span class="emoji">🧠</span><h3>10 heures</h3><p>Je veux une préparation approfondie.</p></div>
+  </div>
+  <h2>Les œuvres au programme</h2>
+  <div class="hint-box">Platon compte pour deux œuvres distinctes au programme : l'<i>Ion</i> (dialogue court) et <i>La République</i>, Livre X (fragment d'un dialogue beaucoup plus long). Elles sont présentées séparément ci-dessous.</div>
+  <div class="work-grid">
+    ${["platon","republique","zola","woolf"].map(w=>{
+      const meta = WORKS_META[w]; const prog = workProgress(w);
+      return `<div class="work-card" onclick="go('${w}')">
+        <div class="tag">${w}</div><h3>${meta.name}</h3>
+        <div class="bar-track"><div class="bar-fill" style="width:${prog.pct}%"></div></div>
+        <div style="font-family:var(--sans);font-size:.78rem;color:var(--ink-faint);margin-top:.3rem;">${prog.done}/${prog.total} passages lus</div>
+      </div>`;
+    }).join("")}
+  </div>
+  <div class="hint-box">Astuce : la fiche « 20% » et le tableau de synthèse (page Fiche 20%) suffisent, seuls, à tenir une dissertation correcte si le temps manque vraiment.</div>`;
+}
+
+function pageTheme(){
+  return `<h1>Le thème en 10 minutes</h1>
+  <p>« Les arcanes de la création » — les trois œuvres n'abordent pas la création de la même façon :</p>
+  <ul>
+    <li><b>Platon</b> (Ion) interroge d'où vient le discours du poète/rhapsode : d'un savoir (technè) ou d'une possession divine ?</li>
+    <li><b>Zola</b> (L'Œuvre) montre de l'intérieur le travail du peintre, l'écart entre vision intérieure et réalisation, et l'échec.</li>
+    <li><b>Woolf</b> (Un lieu à soi) déplace la question vers les conditions matérielles et sociales de la création : qui a le droit, les moyens, l'espace de créer ?</li>
+  </ul>
+  <div class="hint-box">Une progression possible : Platon pose la question du savoir du créateur ; Zola met en scène le corps à corps du créateur avec son œuvre ; Woolf demande qui a accès à la position de créateur. Trois questions différentes — attention à ne pas forcer une fausse continuité en dissertation.</div>`;
+}
+
+function pageParcours(level){
+  if(level===2) return `<h1>Parcours ⚡ 2 heures</h1>
+  <p><b>Objectif</b> : tenir 45 minutes de dissertation sans avoir lu une seule page en entier.</p>
+  <h2>À lire (9 passages ⭐⭐⭐, ~20 min)</h2>
+  <ul>${PASSAGES.filter(p=>p.star===3).map(p=>`<li>${WORKS_META[p.work].name.split(" — ")[0]} — ${p.title} <span class="tag-flag">${p.loc}</span></li>`).join("")}</ul>
+  <h2>À savoir par cœur (~15 min)</h2>
+  <p>Les 3 idées-clés par auteur, 1 citation par auteur minimum, le rapprochement Zola/Woolf (le pont ↔ Judith Shakespeare). Voir la <a href="#" onclick="go('fiche20');return false;">Fiche 20%</a>.</p>
+  <h2>Comparaisons indispensables (~10 min)</h2>
+  <p>D'où vient la création ? Le créateur maîtrise-t-il son œuvre ? Création et souffrance. Voir la page <a href="#" onclick="go('comparaison');return false;">Comparaison</a>.</p>`;
+
+  if(level===5) return `<h1>Parcours 📚 5 heures</h1>
+  <p>Ajoutez au parcours 2h :</p>
+  <h2>Passages supplémentaires ⭐⭐ (~40 min)</h2>
+  <ul>${PASSAGES.filter(p=>p.star===2).map(p=>`<li>${WORKS_META[p.work].name.split(" — ")[0]} — ${p.title} <span class="tag-flag">${p.loc}</span></li>`).join("")}</ul>
+  <h2>Lecture complémentaire recommandée (~1h30)</h2>
+  <p>L'ouverture du chapitre I de L'Œuvre (la rencontre sous l'orage) et la fin du chapitre VIII (le mariage qui tue la passion). Le chapitre I de Woolf en entier (ton, humour, méthode).</p>
+  <h2>Approfondissement analytique (~1h)</h2>
+  <p>Les 12 <a href="#" onclick="go('dissertation');return false;">arguments de dissertation</a> — en retenir au moins 6 activement. Le <a href="#" onclick="go('comparaison');return false;">tableau comparatif complet</a>. Les <a href="#" onclick="go('citations');return false;">12 citations vérifiées</a>.</p>
+  <h2>Comparaisons approfondies (~1h)</h2>
+  <p>Toutes les lignes du tableau comparatif, en particulier « conditions matérielles », « création et société », « qui peut créer ? »</p>`;
+
+  return `<h1>Parcours 🧠 10 heures</h1>
+  <p>Ajoutez au parcours 5h :</p>
+  <ul>
+    <li><b>Lecture intégrale des chapitres pivots de L'Œuvre</b> : II, III, IX, XI, XII en entier (~20-25 min/chapitre) — les seuls pour lesquels ce guide n'offre qu'une reconstruction partielle.</li>
+    <li><b>Lecture intégrale des chapitres I, III et VI de Woolf</b> — les plus denses conceptuellement.</li>
+    <li><b>La République</b> de Platon n'a pas pu être traitée dans ce guide (texte non disponible) — à ajouter si besoin.</li>
+    <li>Relecture croisée : pour chaque ligne du tableau comparatif, rédigez vous-même une phrase de synthèse.</li>
+    <li>Entraînement : traitez au moins 2 sujets du <a href="#" onclick="go('quiz');return false;">niveau 5 du quiz</a> en conditions réelles (2h30, sans notes).</li>
+  </ul>`;
+}
+
+function pageWork(work){
+  const meta = WORKS_META[work];
+  const prog = workProgress(work);
+  let extra = "";
+  if(work==="platon"){
+    extra = `<h2>Carte logique du raisonnement central</h2>
+    <div class="fiche-box" style="font-family:var(--sans);font-size:.9rem;line-height:1.9;">
+      QUESTION — Pourquoi Ion n'est-il habile que sur Homère ?<br>↓<br>
+      RÉPONSE D'ION — « Ils ne composent pas comme Homère » [530c-532b]<br>↓<br>
+      OBJECTION DE SOCRATE — Un art véritable permet toujours de juger le meilleur ET le pire [532c-533c]<br>↓<br>
+      CONSÉQUENCE — Ion n'a pas d'art [533c]<br>↓<br>
+      EXPLICATION ALTERNATIVE — La pierre magnétique : Muse → poète → rapsode → spectateur [533d-536d]<br>↓<br>
+      CONFIRMATION EMPIRIQUE — Ion pleure et a peur en déclamant [535c-e]<br>↓<br>
+      DERNIER TEST — Le savoir des métiers dans Homère [537a-539d]<br>↓<br>
+      IMPASSE D'ION — Prétend connaître l'art du général [540d-541e]<br>↓<br>
+      CONCLUSION — « Tricheur ou homme divin ? » [542a-b]
+    </div>`;
+  }
+  if(work==="republique"){
+    extra = `<div class="hint-box">Attention : la République est un dialogue distinct de l'Ion, beaucoup plus long — seul le Livre X (595a-608b) est au programme. Le fichier reçu va jusqu'à 621d (mythe d'Er, immortalité de l'âme) : cette partie ne traite pas de la création et n'est pas couverte ici.</div>
+    <h2>Structure de l'argument (595a-608b)</h2>
+    <div class="fiche-box" style="font-family:var(--sans);font-size:.9rem;line-height:1.9;">
+      I. QU'EST-CE QUE L'IMITATION ? — Théorie des trois lits : Forme (dieu) → objet (menuisier) → image (peintre) [596a-598c]<br>↓<br>
+      II. L'IMITATEUR NE SAIT RIEN — Triade usager/fabricant/imitateur ; Homère jugé incapable d'avoir formé un seul homme d'État [598c-602c]<br>↓<br>
+      III. EFFET PSYCHOLOGIQUE — La poésie nourrit la partie irrationnelle de l'âme, au détriment de la raison [602c-606d]<br>↓<br>
+      IV. LE VIEUX CONFLIT — Bannissement conditionnel : la poésie pourrait revenir si elle prouve son utilité [606e-608b]
+    </div>`;
+  }
+  if(work==="zola"){
+    const chaps = [
+      ["I","Une nuit d'orage à Paris. Claude croise Christine sous l'averse, l'abrite chez lui. Le lendemain il la dessine pour son grand tableau."],
+      ["II","Sandoz rend visite à Claude. Le chapitre se clôt sur l'auto-destruction de la toile par Claude lui-même — « un meurtre véritable »."],
+      ["III","« Le commencement de la semaine fut désastreux » — crise de doute. Se clôt sur la marche nocturne avec Bongrand : « un métier du tonnerre de Dieu »."],
+      ["IV","Claude retravaille son tableau ; tension avec Christine sur la ressemblance. Se clôt sur une scène de pose espiègle, « le pas du triomphe »."],
+      ["V","Ouverture du Salon des Refusés (1863) ; lilas envoyés par Christine. Se clôt sur leur première nuit d'amour."],
+      ["VI","Suite de la nuit d'amour puis vie à la campagne. Se clôt sur leur départ mélancolique vers « la ville de passion »."],
+      ["VII","Retour à Paris, Claude repris par la fièvre parisienne. Se clôt tard dans la nuit, Christine endormie de fatigue."],
+      ["VIII","Installation rue de Douai, enfant déjà présent. Se clôt sur le constat amer : « l'épouse diminuait l'amante »."],
+      ["IX","Claude loue un hangar à Montmartre. Se clôt sur la mort de l'enfant, transformée en tableau envoyé au Salon."],
+      ["X","Claude croise Fagerolles, candidat au jury, qui promet de l'aider. Se clôt sur une scène de vertige à la fenêtre."],
+      ["XI","Claude reprend le travail avec résignation. Se clôt sur le pont : « cette douceur de mourir »."],
+      ["XII","Chasteté théorique du couple. Dénouement funèbre au cimetière : « Allons travailler »."]
+    ];
+    extra = `<h2>Reconstruction chapitre par chapitre (12 chapitres)</h2>
+    <div class="fiche-box"><ul>${chaps.map(c=>`<li><b>Chapitre ${c[0]}</b> — ${c[1]}</li>`).join("")}</ul></div>`;
+  }
+  if(work==="woolf"){
+    const chaps = [
+      ["I","Déjeuner à « Oxbridge » : thèse centrale énoncée — argent et lieu à soi. Obstacles institutionnels concrets (pelouse, bibliothèque)."],
+      ["II","British Museum : recherche de faits sur la pauvreté des femmes, abondance d'ouvrages d'hommes écrivant sur les femmes."],
+      ["III","Réflexion historique : pourquoi aucune femme n'a écrit à l'époque élisabéthaine ? Expérience de Judith Shakespeare."],
+      ["IV","Femmes écrivaines des siècles suivants : Lady Winchilsea (talent « étiolé » par l'amertume), Aphra Behn (tournant décisif — première à vivre de sa plume), puis Jane Austen et les Brontë (écriture dans le salon commun)."],
+      ["V","Rayon des livres contemporains (1929) : les femmes écrivent dans tous les genres. Mary Carmichael, romancière fictive."],
+      ["VI","Dernier matin, 26 octobre 1928 : thèse de l'esprit androgyne, conclusion adressée aux jeunes femmes qui voudraient écrire."]
+    ];
+    extra = `<h2>Structure en 6 chapitres</h2>
+    <div class="fiche-box"><ul>${chaps.map(c=>`<li><b>Chapitre ${c[0]}</b> — ${c[1]}</li>`).join("")}</ul></div>`;
+  }
+  return `<h1>${meta.name}</h1>
+  <p>${meta.overview}</p>
+  <div class="hint-box">${prog.done} / ${prog.total} passages prioritaires étudiés pour cette œuvre (${prog.pct}%).</div>
+  ${extra}
+  <h2>Passages prioritaires</h2>
+  ${filterBar()}
+  ${passagesFor(work).map(passageCard).join("") || '<div class="empty">Aucun passage pour ce filtre.</div>'}`;
+}
+
+function pageComparaison(){
+  return `<h1>Comparaison des trois œuvres</h1>
+  <div style="overflow-x:auto;">
+  <table class="cmp"><thead><tr><th>Question</th><th>Platon (Ion + République)</th><th>Zola (L'Œuvre)</th><th>Woolf (Un lieu à soi)</th></tr></thead>
+  <tbody>${COMPARAISON.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("")}</tbody></table>
+  </div>
+  <div class="hint-box">Rappel : La République de Platon (mimèsis) n'a pas été fournie — la ligne « création et imitation » reste hors corpus.</div>`;
+}
+
+function pageDissertation(){
+  return `<h1>Banque d'arguments</h1>
+  ${ARGUMENTS.map((a,i)=>`<div class="arg-card">
+    <h3>Argument ${i+1}</h3>
+    <p><b style="font-weight:600;">Thèse :</b> ${a.these}</p>
+    <p><b style="font-weight:600;">Explication :</b> ${a.exp}</p>
+    <p><b style="font-weight:600;">Exemple / passage :</b> ${a.ex}</p>
+    <p><b style="font-weight:600;">Nuance :</b> ${a.nuance}</p>
+    <div class="arg-flow">Formulation : ${a.form}</div>
+  </div>`).join("")}`;
+}
+
+function pageCitations(){
+  return `<h1>Banque de citations vérifiées</h1>
+  ${filterWorkPills()}
+  <div class="cit-grid" id="cit-grid">${CITATIONS.map(c=>`<div class="cit-card" data-work="${c.work}">
+    <blockquote class="quote">« ${c.text} »</blockquote>
+    <div class="who">${WORKS_META[c.work].name.split(" — ")[0]} — ${c.loc}</div>
+    <p style="margin-top:.5rem;font-size:.88rem;"><b style="font-weight:600;">Idée :</b> ${c.idea}</p>
+    <p style="font-size:.88rem;"><b style="font-weight:600;">Usage :</b> ${c.usage}</p>
+  </div>`).join("")}</div>`;
+}
+function filterWorkPills(){
+  return `<div class="filters">
+    <button class="filter-pill active" onclick="filterCit('all',this)">Tous</button>
+    <button class="filter-pill" onclick="filterCit('platon',this)">Ion</button>
+    <button class="filter-pill" onclick="filterCit('republique',this)">La République</button>
+    <button class="filter-pill" onclick="filterCit('zola',this)">Zola</button>
+    <button class="filter-pill" onclick="filterCit('woolf',this)">Woolf</button>
+  </div>`;
+}
+function filterCit(w,btn){
+  document.querySelectorAll(".filters .filter-pill").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll("#cit-grid .cit-card").forEach(c=>{
+    c.style.display = (w==="all"||c.dataset.work===w)?"":"none";
+  });
+}
+
+function pageFiche20(){
+  return `<h1>Fiche ultime — les 20% qui font 80% du travail</h1>
+  <div class="fiche-box"><h3>Platon</h3>
+    <ul>
+      <li>Ion n'a pas d'art (technè), seulement une compétence bornée à Homère.</li>
+      <li>Théorie de la possession divine (pierre magnétique, chaîne Muse → poète → rapsode → spectateur).</li>
+      <li>Le savoir technique prime toujours sur le discours du rapsode.</li>
+      <li>Citation : « le poète est chose ailée, légère, et sainte » [534b].</li>
+      <li>Dilemme final : « tricheur » ou « homme divin ».</li>
+    </ul></div>
+  <div class="fiche-box"><h3>Zola</h3>
+    <ul>
+      <li>Rencontre Claude/Christine → matériau pictural immédiat.</li>
+      <li>Claude détruit lui-même sa toile (fin ch. II).</li>
+      <li>Même Bongrand, reconnu, souffre à chaque œuvre (fin ch. III).</li>
+      <li>Le mariage « diminue » la passion (fin ch. VIII).</li>
+      <li>La mort de l'enfant devient un « chef-d'œuvre » envoyé au Salon (fin ch. IX).</li>
+      <li>Le pont : « cette douceur de mourir » (fin ch. XI).</li>
+      <li>Fin : « Allons travailler ».</li>
+    </ul></div>
+  <div class="fiche-box"><h3>Woolf</h3>
+    <ul>
+      <li>Thèse : argent + lieu à soi, condition de la fiction chez la femme.</li>
+      <li>Refus volontaire de conclure sur une vérité fermée.</li>
+      <li>La fiction est « attachée à la vie » comme une toile d'araignée.</li>
+      <li>Judith Shakespeare : le génie sans conditions s'éteint et meurt.</li>
+      <li>Le grand esprit créateur est androgyne.</li>
+    </ul></div>
+  <div class="fiche-box"><h3>10 idées transversales</h3>
+    <ul>
+      <li>Aucune œuvre ne présente le créateur comme pleinement maître de son œuvre.</li>
+      <li>Deux formes opposées de dépossession : heureuse (Platon) vs destructrice (Zola).</li>
+      <li>La reconnaissance institutionnelle structure les trois œuvres à des moments différents.</li>
+      <li>Le talent seul ne suffit jamais.</li>
+      <li>La création peut tuer : par excès (Zola) ou par empêchement (Woolf).</li>
+      <li>Aucune œuvre ne conclut vraiment sur une vérité fermée.</li>
+      <li>Le rapport créateur/modèle peut être une appropriation (Zola, ch. IV).</li>
+      <li>Le discours sur l'art n'a pas la valeur du savoir technique lui-même.</li>
+      <li>L'œuvre n'est jamais coupée du réel matériel qui la rend possible.</li>
+      <li>Les trois œuvres interrogent qui a le droit ou la capacité de créer.</li>
+    </ul></div>
+  <div class="hint-box">Le rapprochement le plus solide et le plus rentable du corpus : le pont de Claude (fin XI, Zola) ↔ le suicide de Judith Shakespeare (chap. III, Woolf).</div>`;
+}
+
+function pageQuiz(){
+  const levels = [1,2,3,4,5];
+  const labels = {1:"Niveau 1 — Factuel",2:"Niveau 2 — Compréhension",3:"Niveau 3 — Comparatif",4:"Niveau 4 — Dissertation",5:"Niveau 5 — Mini-sujets"};
+  return `<h1>Test de maîtrise</h1>
+  ${levels.map(l=>`<h2>${labels[l]}</h2>${QUIZ.filter(q=>q.level===l).map((q,i)=>{
+    const qid = "q-"+l+"-"+i;
+    return `<div class="quiz-q">
+      <div class="qtag">${labels[l]}</div>
+      <p><b style="font-weight:600;">${q.q}</b></p>
+      <button class="reveal-btn" onclick="document.getElementById('${qid}').classList.toggle('shown')">Afficher la correction</button>
+      <div class="answer" id="${qid}">${q.a}</div>
+    </div>`;
+  }).join("")}`).join("")}`;
+}
+
+function pageFlashcards(){
+  if(fcIndex>=FLASHCARDS.length) fcIndex=0;
+  const card = FLASHCARDS[fcIndex];
+  return `<h1>Flashcards</h1>
+  <div class="fc-wrap">
+    <div class="fc-outer">
+      <div class="fc" onclick="flipCard()">
+        <div class="side-label">${fcFlipped?"Réponse":"Question"}</div>
+        <div>${fcFlipped?card.a:card.q}</div>
+      </div>
+    </div>
+    <div class="fc-counter">${fcIndex+1} / ${FLASHCARDS.length} — cliquez la carte pour retourner</div>
+    <div class="fc-judge">
+      <button onclick="judgeCard(true)">✓ Je savais</button>
+      <button onclick="judgeCard(false)">↻ À revoir</button>
+    </div>
+    <div class="fc-nav">
+      <button onclick="fcMove(-1)">← Précédent</button>
+      <button onclick="fcMove(1)">Suivant →</button>
+    </div>
+  </div>`;
+}
+function flipCard(){ fcFlipped=!fcFlipped; render(); }
+function fcMove(d){ fcIndex=(fcIndex+d+FLASHCARDS.length)%FLASHCARDS.length; fcFlipped=false; render(); }
+function judgeCard(ok){
+  const key="fc-"+fcIndex;
+  if(!ok) state.bookmarks[key]=true; else delete state.bookmarks[key];
+  saveStore();
+  fcMove(1);
+}
+
+function pageRevisions(){
+  const bm = PASSAGES.filter(p=>state.bookmarks[p.id]);
+  const fcBm = FLASHCARDS.map((c,i)=>({c,i})).filter(x=>state.bookmarks["fc-"+x.i]);
+  return `<h1>Mes révisions</h1>
+  <h2>Passages marqués « à revoir »</h2>
+  ${bm.length? bm.map(passageCard).join("") : '<div class="empty">Aucun passage marqué pour le moment.</div>'}
+  <h2>Flashcards marquées « à revoir »</h2>
+  ${fcBm.length? fcBm.map(x=>`<div class="fiche-box"><p><b style="font-weight:600;">${x.c.q}</b></p><p style="color:var(--ink-soft);">${x.c.a}</p></div>`).join("") : '<div class="empty">Aucune flashcard marquée pour le moment.</div>'}`;
+}
+
+/* =========================================================
+   ROUTER
+   ========================================================= */
+function render(){
+  let html = "";
+  switch(currentPage){
+    case "accueil": html = pageAccueil(); break;
+    case "theme": html = pageTheme(); break;
+    case "parcours2h": html = pageParcours(2); break;
+    case "parcours5h": html = pageParcours(5); break;
+    case "parcours10h": html = pageParcours(10); break;
+    case "platon": html = pageWork("platon"); break;
+    case "republique": html = pageWork("republique"); break;
+    case "zola": html = pageWork("zola"); break;
+    case "woolf": html = pageWork("woolf"); break;
+    case "comparaison": html = pageComparaison(); break;
+    case "dissertation": html = pageDissertation(); break;
+    case "citations": html = pageCitations(); break;
+    case "fiche20": html = pageFiche20(); break;
+    case "quiz": html = pageQuiz(); break;
+    case "flashcards": html = pageFlashcards(); break;
+    case "revisions": html = pageRevisions(); break;
+    default: html = pageAccueil();
+  }
+  document.getElementById("content").innerHTML = html;
+  updateProgressBar();
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+function buildSearchIndex(){
+  const idx = [];
+  PASSAGES.forEach(p=>idx.push({type:"Passage",work:p.work,label:p.title,page:p.work,text:(p.title+" "+p.contexte+" "+p.fait+" "+p.explication+" "+p.retenir+" "+p.theme+" "+p.liens+" "+p.quote).toLowerCase()}));
+  CITATIONS.forEach(c=>idx.push({type:"Citation",work:c.work,label:c.text,page:"citations",text:(c.text+" "+c.idea+" "+c.usage).toLowerCase()}));
+  ARGUMENTS.forEach((a,i)=>idx.push({type:"Argument",work:"",label:a.these,page:"dissertation",text:(a.these+" "+a.exp+" "+a.ex+" "+a.nuance).toLowerCase()}));
+  COMPARAISON.forEach(r=>idx.push({type:"Comparaison",work:"",label:r[0],page:"comparaison",text:r.join(" ").toLowerCase()}));
+  return idx;
+}
+const SEARCH_INDEX = buildSearchIndex();
+document.getElementById("search-input").addEventListener("input", (e)=>{
+  const v = e.target.value.trim().toLowerCase();
+  const box = document.getElementById("search-results");
+  if(v.length<2){ box.innerHTML=""; return; }
+  const hits = SEARCH_INDEX.filter(x=>x.text.includes(v)).slice(0,12);
+  box.innerHTML = hits.length? hits.map(h=>`<div class="search-hit" onclick="go('${h.page}')"><b>${h.type}</b> — ${h.label}</div>`).join("")
+    : '<div class="empty">Aucun résultat.</div>';
+});
+
+/* init */
+document.querySelector('.nav-btn[data-page="accueil"]').classList.add("active");
+render();
+</script>
+</body>
+</html>
